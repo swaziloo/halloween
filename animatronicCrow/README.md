@@ -14,21 +14,21 @@ and [Blender](https://www.blender.org/download/releases/4-4/).
 
 #### Crow ####
 
-| Qty | Part                     | Note                                                                                                                          |
-|-----|--------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| 2   | 5mm Red LEDs             | For the eyes. I am using frosted.                                                                                             |
-| 1   | SG90 5v Servo            |                                                                                                                               |
-| 1   | 28BYJ-48 5v Stepper      | If using CC5x12 you do not need the breakout board (though you could transfer those components to the CC5x12.                 |
-| 1   | 40mm 4Ω Speaker          | 8Ω will work.                                                                                                                 |
-| 1   | Micro SD Card            | For the mp3 audio files.                                                                                                      |
-| 1   | HC-SR312 AM312 Mini PIR  | Human motion sensor.                                                                                                          |
-| 3   | Wires/Connectors         | Two 2-wire and one 3-wire for the speaker, LEDs, and PIR. CC5X12 uses standard 2.54mm mounts (or could be soldered directly). |
-| 1   | Large Paperclip          | ~1.25mm thick.                                                                                                                |
-| 8   | M3x4x5 Heat Melt Inserts | 5mm tall inserts will also fit.                                                                                               |
-| 8   | M3 screws                | 2 x 8mm for the head, 4 x 6mm for the stepper and PCB, 2 x 5mm countersunk for the body (or regular 6mm should work).         |
-| 4   | 9 x 2mm magnets          | Neodymium high strength magnets for attaching tail to body.                                                                   |
-|     | Hot Glue                 | Black preferred.                                                                                                              |
-|     | Polyfill                 | Just a little for sound dampening in the speaker housing.                                                                     |
+| Qty | Part                     | Note                                                                                                                               |
+|-----|--------------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| 2   | 5mm Red LEDs             | For the eyes. I am using frosted.                                                                                                  |
+| 1   | SG90 5v Servo            |                                                                                                                                    |
+| 1   | 28BYJ-48 5v Stepper      | If using CC5x12 you do not need the breakout board (though you could transfer those components to the CC5x12).                     |
+| 1   | 40mm 4Ω Speaker          | 8Ω will work.                                                                                                                      |
+| 1   | Micro SD Card            | For the mp3 audio files.                                                                                                           |
+| 1   | HC-SR312 AM312 Mini PIR  | Human motion sensor.                                                                                                               |
+| 3   | Wires/Connectors         | Two 2-wire and one 3-wire for the speaker, LEDs, and PIR. CC5X12 uses standard 2.54mm pin headers (or could be soldered directly). |
+| 1   | Large Paperclip          | ~1.25mm thick.                                                                                                                     |
+| 8   | M3x4x5 Heat Melt Inserts | 5mm tall inserts will also fit.                                                                                                    |
+| 8   | M3 screws                | 2 x 8mm for the head, 4 x 6mm for the stepper and PCB, 2 x 5mm countersunk for the body (or regular 6mm should work).              |
+| 8   | 9 x 2mm magnets          | Neodymium high strength magnets for attaching tail to body.                                                                        |
+|     | Hot Glue                 | Black preferred.                                                                                                                   |
+|     | Polyfill                 | Just a little for sound dampening in the speaker housing.                                                                          |
 
 #### Creature Control 5x12 ####
 Note that the CC5x12 board will not be fully filled for this project. 
@@ -76,4 +76,3 @@ The RP2040-Zero can be plugged into power (including your computer) while the 5v
 |-----------------|------------------------------------------------------------------------------------------------|
 | Actuator Spacer | Fits between the SG90 and the 90-degree bend in the control wire.                              |
 | PCB Mount       | Small rail to mount the Creature Control 5x12 board with M3 hardware to slide inside the body. |
-                                                                                           |
