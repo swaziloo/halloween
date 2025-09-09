@@ -9,7 +9,7 @@ My work has been done in [KiCad](https://www.kicad.org/),
 [FreeCAD](https://www.freecad.org/),
 and [Blender](https://www.blender.org/download/releases/4-4/).
 
-## [Build Guide](BUILD.md) ##
+## [Crow Build Guide](BUILD.md) ##
 ### Parts List: ###
 
 #### Crow ####
@@ -30,7 +30,7 @@ and [Blender](https://www.blender.org/download/releases/4-4/).
 |     | Hot Glue                 | Black preferred.                                                                                                                   |
 |     | Polyfill                 | Just a little for sound dampening in the speaker housing.                                                                          |
 
-#### Creature Control 5x12 ####
+#### [Creature Control 5x12](../creatureControl/README.md) ####
 Note that the CC5x12 board will not be fully filled for this project. 
 CC5x12 provides multiple options for powering the 5v rail.
 ***You must only ever connect one of them at a time***. 
@@ -55,8 +55,8 @@ The RP2040-Zero can be plugged into power (including your computer) while the 5v
 | 2 (optional  | 5.1kΩ Resistors                   | If using a USB battery.                                      |
 | optional     | 2.54mm Pin Headers                | If not soldering wires directly to board.                    |
 
-### Modifications and model sources: ###
 ![New beak/head in the foreground.](images/AniCrow011.jpg)
+### Modifications and model sources: ###
 
 | Model                             | Source           | Modifications                                                                                                                                                                                                                        |
 |-----------------------------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
