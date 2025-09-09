@@ -4,7 +4,7 @@ Hence Creature Control 5x12. Designed to enable a bunch of capability using an i
 ![The Creature Control 5x12 PCB](images/cc5x12-001.png)
 ## 5x12 v1.0 ##
 Provides a 5-volt 3-amp power rail to supply 3 servos and 2 steppers controlled by a RP2040-Zero which is also wired to incorporate 2 LEDs, 2 motion sensors, the DFPlayer Mini mp3 player and a pin header for the remaining pins.
-Easily programmable using Arduino libraries.
+Designed to be hand-soldered and easily programmable using Arduino libraries.
 
 *Gerber files have been produced for JLCPCB but may work elsewhere.*
 
@@ -13,7 +13,7 @@ Easily programmable using Arduino libraries.
 *The 5 volt power rail allows for multiple source connections but only one should be used at any given time.* 
 *Do not connect more than one 5 volt source to the power rail!*
 (Unless you really know what you're doing.)
-It is safe to connect the power rail and the RP2040-Zero to your PC at the same time--in fact it's necessary for testing.
+It is safe to connect the power to the 5v rail and the RP2040-Zero to your PC at the same time--in fact it's necessary for testing.
 ### Parts List ###
 The intent is that one would install only the components needed for a project.
 
