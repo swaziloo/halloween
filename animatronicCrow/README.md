@@ -41,6 +41,8 @@ The RP2040-Zero can be plugged into power (including your computer) while the 5v
 |--------------|-----------------------------------|--------------------------------------------------------------|
 | 1            | RP2040-Zero                       | Waveshare or equivalent.                                     |
 | 1            | DFPlayer Mini                     | DFRobot or equivalent.                                       |
+| 1            | 100nF 50v Ceramic Capacitor (104) | (v1.1) for DFPlayer Mini 3V3                                 |
+| 1            | 1KΩ Resistor                      | (v1.1) for MCU GP0->DFPlayer Mini RX                         |
 | 1            | IC DIP Socket 16-Pin              | For ULN2003A.                                                |
 | 1            | ULN2003A                          |                                                              |
 | 1            | XH2.54mm 5-Pin Connector          | Straight pin for stepper.                                    |
@@ -48,7 +50,7 @@ The RP2040-Zero can be plugged into power (including your computer) while the 5v
 | 1 (optional) | 3mm LED                           | For power rail indicator.                                    |
 | 1 (optional) | Resistor for above LED            | I used 2.2kΩ for a blue 3mm LED.                             |
 | 1            | Resistor for Eye LEDs             | I used a 2.2kΩ for a pair of red 5mm LEDs wired in parallel. |
-| 1            | 10nF 50v Ceramic Capacitor        | For ULN2003A.                                                |
+| 1            | 1uF 50v Ceramic Capacitor (105)   | For ULN2003A (mislabelled on v1.0 silk).                     |
 | 2            | 100uF 16v Electrolytic Capacitor  | For servo and stepper.                                       |
 | 1            | 1000uF 16v Electrolytic Capacitor | For 5v rail.                                                 |
 | 1 (optional) | 5.5x2.1MM DC-005 Power Jack       | If using a 5v/3A adapter.                                    |

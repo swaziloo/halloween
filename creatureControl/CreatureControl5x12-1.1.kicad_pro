@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 1.0,
-          "height": 1.7,
-          "width": 1.7
+          "drill": 0.8,
+          "height": 1.6,
+          "width": 1.6
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -58,7 +58,16 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        [
+          "nonmirrored_text_on_back_layer|177823778|30744201|b9fd86a2-cd36-42a5-bf3b-1d9bd11fdc7c|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "silk_overlap|123130000|74462500|69465327-0ccd-40be-bd9d-fc4d7f517818|948aae1e-c9fa-4539-a1bf-ed0391704365",
+          ""
+        ]
+      ],
       "meta": {
         "version": 2
       },
@@ -88,7 +97,7 @@
         "item_on_disabled_layer": "error",
         "items_not_allowed": "error",
         "length_out_of_range": "error",
-        "lib_footprint_issues": "warning",
+        "lib_footprint_issues": "ignore",
         "lib_footprint_mismatch": "ignore",
         "malformed_courtyard": "error",
         "microvia_drill_out_of_range": "error",
@@ -465,7 +474,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "CreatureControl5x12-1.0.kicad_pro",
+    "filename": "CreatureControl5x12-1.1.kicad_pro",
     "version": 3
   },
   "net_settings": {
