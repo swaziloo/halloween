@@ -25,9 +25,11 @@ and [Blender](https://www.blender.org/download/releases/4-4/).
 | 1   | HC-SR312 AM312 Mini PIR  | Human motion sensor.                                                                                                               |
 | 3   | Wires/Connectors         | Two 2-wire and one 3-wire for the speaker, LEDs, and PIR. CC5X12 uses standard 2.54mm pin headers (or could be soldered directly). |
 | 1   | Large Paperclip          | ~1.25mm thick.                                                                                                                     |
-| 8   | M3x4x5 Heat Melt Inserts | 5mm tall inserts will also fit.                                                                                                    |
-| 8   | M3 screws                | 2 x 8mm for the head, 4 x 6mm for the stepper and PCB, 2 x 5mm countersunk for the body (or regular 6mm should work).              |
-| 8   | 9 x 2mm magnets          | Neodymium high strength magnets for attaching tail to body.                                                                        |
+| 1   | 2mm Rod                  | About 15mm long for the beak hinge. I'm using carbon fiber, but any material should work.                                          |
+| 8   | M3x4x5 Heat Melt Inserts | 5mm tall (M3x5x5) inserts will also fit.                                                                                           |
+| 10  | M3 screws                | 4 x 8mm for the head, 4 x 6mm for the stepper and PCB, 2 x 5mm countersunk for the body (or regular 6mm should work).              |
+| 2   | M3 nuts                  | For the stepper mount collar in the head.                                                                                          |
+| 8   | 10 x 3mm magnets         | Neodymium high strength magnets for attaching tail to body.                                                                        |
 |     | Hot Glue                 | Black preferred.                                                                                                                   |
 |     | Polyfill                 | Just a little for sound dampening in the speaker housing.                                                                          |
 
@@ -63,7 +65,7 @@ The RP2040-Zero can be plugged into power (including your computer) while the 5v
 
 | Model                             | Source           | Modifications                                                                                                                                                                                                                        |
 |-----------------------------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Global                            |                  | Standardized on M3 x 4 or 5 x 5 heat set inserts for M3 fasteners.                                                                                                                                                                   
+| Global                            |                  | Standardized on M3 x 4 or 5 x 5 heat set inserts for M3 fasteners.                                                                                                                                                                   |
 | Head                              | andymcculloch    | Refined beak shape to add more of a point. Smoothed/bevelled lower beak opening. Cut away mounts and rebuilt them slightly wider and short enough to fit below the SG90 servo.                                                       |
 | Beak                              | Doctor_Johnsmith | Added a lower collar that fits inside the head without a visible cut-away. Re-drew mounting rail. Sliced to enable 3D printing standing up.                                                                                          |
 | Beak Servo Mount Plate            | andymcculloch    | Refined connector tower to accommodate the larger beak. Straightened out SG-90 mount and shrunk mounting holes to match the screws that come with SG90 servos. Added hexagonal grille for sound. Moved M3 screw holes.               |

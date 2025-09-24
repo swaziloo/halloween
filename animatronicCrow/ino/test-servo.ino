@@ -8,7 +8,7 @@ const int ledPin = 14;
 const int servoPin = 2;
 
 int beakOpenDeg = 0;
-int beakCloseDeg = 30;
+int beakCloseDeg = 60;
 int servoBeakDelayMs = 4000; 
 
 unsigned long currentMillis;
