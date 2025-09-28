@@ -14,9 +14,10 @@ The magnet mount holes are sealed and will require you to pause during printing 
 The spaces are 3.5mm tall, so for example, at a 0.16mm layer height, I have to pause on layer 25.
 *Measure your magnets.*
 Mine are 2.66mm tall, so taking that away from 3.5mm and leaving a little slack, I scale the Z axis of the 1.0mm shims (yellow arrows below) to 80%.
+
 Magnets must be installed with the correct polarity!
 Mark the Tail and Body sides so you don't get confused.
-Once in the space, I add a touch of CA glue to the shim and stick one on each before resuming the print.
+I add a touch of CA glue to the shim and stick one onto each magnet before resuming the print.
 
 ![Magnets inserted and shims being glued](../images/AniCrow028.jpg)
 
