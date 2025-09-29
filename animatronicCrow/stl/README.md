@@ -12,6 +12,7 @@ Consider PETG for a more weather resistant material, but note that the model is 
 ## Important Note: ##
 The magnet mount holes are sealed and will require you to pause during printing to install them.
 The spaces are 3.5mm tall, so for example, at a 0.16mm layer height, I have to pause on layer 25.
+
 *Measure your magnets.*
 Mine are 2.66mm tall, so taking that away from 3.5mm and leaving a little slack, I scale the Z axis of the 1.0mm shims (yellow arrows below) to 80%.
 
@@ -42,8 +43,8 @@ Add dry lube to both before assembly.
 ### PIR Components in Green Circles ###
 * A template for cutting out the PIR window (from IR transmissive 1mm acrylic).
 * A holder for the PIR sensor.
-* An internal cover (to prevent the sensor from seeing the crow move it's head from the inside).
-* Crow body with PIR window cutout.
+* An internal cover (to prevent the sensor from seeing the crow move its head from the inside).
+* Crow body with PIR window cutout. 
 * Feet with or without holes will work--the holes are for a zip tie or wire attachment.
 
 # Crow with No Sensor or Radar Sensor #
