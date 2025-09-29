@@ -1,5 +1,57 @@
+![Crow parts everywhere](images/AniCrow030.jpg)
 # Build Guide #
-## Head
+___
+## Parts List: ##
+
+### Crow ###
+
+| Qty | Part                     | Note                                                                                                                           |
+|-----|--------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| 2   | 5mm Red LEDs             | For the eyes. I am using frosted.                                                                                              |
+| 1   | SG90 5v Servo            |                                                                                                                                |
+| 1   | 28BYJ-48 5v Stepper      | If using CC5x12 stepper control you do not need the breakout board (though you could transfer those components to the CC5x12). |
+| 1   | 40mm 4Ω, 3w Speaker      | 8Ω will work.                                                                                                                  |
+| 1   | Micro SD Card            | For the mp3 audio files.                                                                                                       |
+| 1   | HC-SR312 AM312 Mini PIR  | Optional. Human motion sensor. *Testing the LD1020 radar sensor soon*                                                          |
+| 3   | Wires/Connectors         | Two 2-wire and one 3-wire for the speaker, LEDs, and PIR. CC5X12 uses standard 2.54mm pin headers (or could be soldered directly). |
+| 1   | Large Paperclip          | ~1.25mm thick.                                                                                                                 |
+| 1   | 2mm Rod                  | About 15mm long for the beak hinge. I'm using carbon fiber, but any material should work.                                      |
+| 9   | M3x4x5 Heat Melt Inserts | 5mm tall (M3x5x5) inserts will also fit.                                                                                       |
+| 11  | M3 screws                | 5 x 8mm for the head and tail, 4 x 6mm for the stepper and PCB, 2 x 5mm countersunk for the body (or regular 6mm should work). |
+| 2   | M3 nuts                  | For the stepper mount collar in the head.                                                                                      |
+| 8   | 10 x 3mm magnets         | Neodymium high strength magnets for attaching tail to body.                                                                    |
+|     | Hot Glue                 | Black preferred.                                                                                                               |
+|     | Polyfill                 | Just a little for sound dampening in the speaker housing.                                                                      |
+
+### [Creature Control 5x12](../creatureControl/README.md) ###
+Note that the CC5x12 board will not be fully filled for this project.
+CC5x12 provides multiple options for powering the 5v rail.
+***You must only ever connect one of them at a time***.
+The RP2040-Zero can be plugged into power (including your computer) while the 5v rail is also receiving power.
+
+| Qty          | Part                              | Note                                                         |
+|--------------|-----------------------------------|--------------------------------------------------------------|
+| 1            | RP2040-Zero                       | Waveshare or equivalent.                                     |
+| 1            | DFPlayer Mini                     | DFRobot or equivalent.                                       |
+| 1            | 100nF 50v Ceramic Capacitor (104) | (v1.1) for DFPlayer Mini 3V3                                 |
+| 1            | 1KΩ Resistor                      | (v1.1) for MCU GP0->DFPlayer Mini RX                         |
+| 1            | IC DIP Socket 16-Pin              | For ULN2003A.                                                |
+| 1            | ULN2003A                          |                                                              |
+| 1            | XH2.54mm 5-Pin Connector          | Straight pin for stepper.                                    |
+| 1            | 1N5819 Schottky Diode             | For RP2040-Zero VCC.                                         |
+| 1 (optional) | 3mm LED                           | For power rail indicator.                                    |
+| 1 (optional) | Resistor for above LED            | I used 2.2kΩ for a blue 3mm LED.                             |
+| 1            | Resistor for Eye LEDs             | I used a 2.2kΩ for a pair of red 5mm LEDs wired in parallel. |
+| 1            | 1uF 50v Ceramic Capacitor (105)   | For ULN2003A (mislabelled on v1.0 silk).                     |
+| 2            | 100uF 16v Electrolytic Capacitor  | For servo and stepper.                                       |
+| 1            | 1000uF 16v Electrolytic Capacitor | For 5v rail.                                                 |
+| 1 (optional) | 5.5x2.1MM DC-005 Power Jack       | If using a 5v/3A adapter.                                    |
+| 1 (optional) | USB-C 6-pin Surface Mount         | If using a USB battery.                                      |
+| 2 (optional  | 5.1kΩ Resistors                   | If using a USB battery.                                      |
+| optional     | 2.54mm Pin Headers                | If not soldering wires directly to board.                    |
+
+___
+## Head ##
 
 ![Crow Head Parts Before Sound Grille](images/AniCrow018.jpg)
 
@@ -22,3 +74,10 @@
 | [![Validate the ranges in software](images/AniCrow020.png)](https://youtube.com/shorts/lqEB10gqAUw) (YouTube video link) | Connect the servo mount plate to the head with a couple M3 screws and reconnect the CC5x12. If all has gone well, the beak will be opening and closing fully.<br/><br/> * If you hear the servo making a clicking or grinding sound when open, you can either loosen the bend in the actuator or adjust the servo arm connection.<br/> * If the beak doesn't open completely you can tighten up the actuator bend or adjust the servo arm connection.<br/><br/>Adjust the `beakCloseDeg` and re-upload until the beak fully opens and closes without grinding noises. About 0 and 60 degrees. Small changes matter. |
 | ![Install mounting screws into stepper collar](images/AniCrow024.jpg)                                                    | Sand the sliding arc surface on the inside of the stepper collar smooth and lube with dry lube. Drop two M3 nuts into the slots and install two 8mm M3 screws by fitting the hex wrench through the access holes until they will just touch the stepper pin.                                                                                                                                                                                                                                                                                                                                                        |
 | ![Assembly](images/AniCrow001.jpg)                                                                                       | Once everything looks good, install the screw in the servo arm and route the cables through the plates. Stack the parts and join them with two M3 8mm screws. Your crow head is ready to go.                                                                                                                                                                                                                                                                                                                                                                                                                        |
+
+___
+## Body ##
+*Coming Soon*
+___
+## Software ##
+*Coming Soon*

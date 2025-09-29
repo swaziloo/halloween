@@ -1,7 +1,8 @@
+![The Creature Control 5x12 PCB](images/cc5x12-003.png)
 # Creature Control PCB #
 When hand soldering a board to enable the animatronic crow I realized that I wanted a half-dozen crows and maybe some talking skulls and hand soldering wasn't my favorite way to spend my time.
 Hence Creature Control 5x12. Designed to enable a bunch of capability using an inexpensive and easy to program Raspberry Pi 2040 in the tiny Waveshare Zero format.
-![The Creature Control 5x12 PCB](images/cc5x12-003.png)
+
 ## 5x12 v1.0 ##
 Provides a 5-volt 3-amp power rail to supply 3 servos and 2 steppers controlled by a RP2040-Zero which is also wired to incorporate 2 LEDs, 2 motion sensors, the DFPlayer Mini mp3 player and a pin header for the remaining pins.
 Designed to be hand-soldered and easily programmable using Arduino libraries.
