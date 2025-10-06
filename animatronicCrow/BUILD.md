@@ -124,6 +124,6 @@ Select the *Waveshare RP2040-Zero* board in the board manager.
 
 ### Sketches ###
 * [test-audio.ino](ino/test-audio.ino): Confirm the DFPlayer Mini installation and connections. Details on the serial monitor. Eyes blink for each file played.
-* [test-servo.ino](ino/test-servo.ino): Reset the servo to zero, then cycle half, full, zero every four seconds. Details on the serial monitor. Eyes blink for each file played.
+* [test-servo.ino](ino/test-servo.ino): Reset the servo to zero, then cycle half, full, zero every four seconds. Details on the serial monitor. Eyes blink for each movement.
 * [test-all-with-loop.ino](ino/test-all-with-loop.ino): Configures a crow, initializes each component in sequence, then enters a simple random/motion loop. Details on the serial monitor.
 
