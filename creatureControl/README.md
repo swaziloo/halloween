@@ -54,7 +54,28 @@ I will add a full build guide, but for the time-being, here are a few tips:
 * If you are installing the USB-C socket, do that first and check the electrical connections. Every other component is easier to hand solder.
 * The RP2040-Zero can be powered by its USB-C connection or the board 5v power, but it will not provide power to the steppers or servos. LEDs, the DFPlayer Mini and sensors draw power from the RP2040-Zero 3V3.
 * The C1 capacitor is intended to smooth out the 5v supply for the board. C2-C6 provide demand power for their nearby stepper or servo. Only install caps for those you intend to connect.
+___
 
+## Testing ##
+Install the Arduino IDE and the following libraries:
+[AccelStepper](https://www.airspayce.com/mikem/arduino/AccelStepper),
+[DFRobotDFPlayerMini](https://github.com/DFRobot/DFRobotDFPlayerMini),
+[arduino-pico](https://github.com/earlephilhower/arduino-pico) by Earle Philhower,
+[Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel).
+Install using the library manager in the Arduino IDE.
+
+* Enable the *Waveshare RP2040-Zero* board in the board manager.
+* Connect power to one of the 5v inputs and the RP2040-Zero to your pc. 
+* Select the connected device/port and ensure the Waveshare RP2040-Zero board is assigned.
+* Copy the [BoardTest.ino](BoardTest.ino) sketch into the IDE.
+* Set 'true' for available components at the top of the sketch. 
+* Select the 'Upload' button.
+* The sketch should compile, the board should initialize, and a test loop should run.
+
+The steppers, servos, and MP3 components will cycle.
+The LED(s) will reflect the sensor(s) states.
+
+___
 ## Connecting to a 12v Rail ##
 You should be able to control 12v steppers and servos using the CC5X12 by eliminating the 5v connection to them and providing separate power. 
 If you do this, you will want to pull a shared ground over from the block connector or another board source.
