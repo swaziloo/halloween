@@ -30,8 +30,8 @@ The intent is that one would install only the components needed for a project.
 | 1            |       | RP2040-Zero                                                  | Waveshare or equivalent.                                                                                 |
 | 1            | D2    | 1N5819 Schottky Diode                                        | For RP2040-Zero VCC.                                                                                     |
 | 1            |       | DFPlayer Mini                                                | DFRobot or equivalent.                                                                                   |
-| 1            | R6    | 100nF 50v Ceramic Capacitor (104)                            | (v1.1) for DFPlayer Mini 3V3                                                                             |
-| 1            | C9    | 1KΩ Resistor                                                 | (v1.1) for MCU GP0->DFPlayer Mini RX                                                                     |
+| 1            | C9    | 100nF 50v Ceramic Capacitor (104)                            | (v1.1) for DFPlayer Mini 3V3                                                                             |
+| 1            | R6    | 1KΩ Resistor                                                 | (v1.1) for MCU GP0->DFPlayer Mini RX                                                                     |
 | 1-2          |       | ULN2003A                                                     | Stepper driver.                                                                                          |
 | 1-2          |       | IC DIP Socket 16-Pin                                         | For ULN2003A.                                                                                            |
 | 1-2          | C7,C8 | 1µF 50v Ceramic Capacitor (105)                              | For ULN2003A (mislabelled on silk).                                                                      |
@@ -46,3 +46,18 @@ The intent is that one would install only the components needed for a project.
 | 2 (optional) | R1,R2 | 5.1kΩ Resistors                                              | If using a USB battery.                                                                                  |
 | 1 (optional) | J3    | KF350-2P 3.5mm Pitch 2Pin PCB Screw Terminal Block Connector | If using a wired 5v source or drain. Also useful if needing to share ground with an external power rail. |
 | optional     |       | 2.54mm Pin Headers                                           | For board connections.                                                                                   |
+
+## Building the CC5x12 ##
+
+I will add a full build guide, but for the time-being, here are a few tips:
+* You do not need to fill the board. It is perfectly acceptable to install only the connections and components you intend to use.
+* If you are installing the USB-C socket, do that first and check the electrical connections. Every other component is easier to hand solder.
+* The RP2040-Zero can be powered by its USB-C connection or the board 5v power, but it will not provide power to the steppers or servos. LEDs, the DFPlayer Mini and sensors draw power from the RP2040-Zero 3V3.
+* The C1 capacitor is intended to smooth out the 5v supply for the board. C2-C6 provide demand power for their nearby stepper or servo. Only install caps for those you intend to connect.
+
+## Connecting to a 12v Rail ##
+You should be able to control 12v steppers and servos using the CC5X12 by eliminating the 5v connection to them and providing separate power. 
+If you do this, you will want to pull a shared ground over from the block connector or another board source.
+*I have not tested this functionality.*
+
+

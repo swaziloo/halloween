@@ -41,16 +41,18 @@ Add dry lube to both before assembly.
 ![PIR Crow STL Files for 3D printing](../images/AniCrow026.png)
 
 ### PIR Components in Green Circles ###
-* A template for cutting out the PIR window (from IR transmissive 1mm acrylic).
-* A holder for the PIR sensor.
+* *Not Pictured:* The beak actuator.  *(Recommend printing with 0.2mm nozzle.)*
+* A holder for the PIR sensor. *(Recommend printing with 0.2mm nozzle.)*
 * An internal cover (to prevent the sensor from seeing the crow move its head from the inside).
-* Crow body with PIR window cutout. 
+* Crow body with PIR window cutout.
+* An oval for covering the PIR window.
 * Feet with or without holes will work--the holes are for a zip tie or wire attachment.
 
 # Crow with No Sensor or Radar Sensor #
 ![Crow STL Files for 3D printing](../images/AniCrow027.png)
 
-* A missing radar mount belongs in the green circle (will update once I have the LD1020 in hand).
+* *Not Pictured:* The beak actuator.  *(Recommend printing with 0.2mm nozzle.)*
+* *Not Pictured:* A radar mount belongs in the green circle (will update once I have the LD1020 in hand).
 * Crow body with NO window cutout.
 * Feet with or without holes will work--the holes are for a zip tie or wire attachment.
 

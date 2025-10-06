@@ -18,12 +18,12 @@ const int stepPin3 = 7;
 const int stepPin4 = 8;
 
 unsigned int beakOpenDeg = 0;
-unsigned int beakCloseDeg = 30;
+unsigned int beakCloseDeg = 47;
 
-int neckRange = 740;
+int neckRange = 1400;
 int neckLeft = neckRange/2+1;
 int neckRight = -(neckRange/2-1);
-int center = 410;
+int center = 750;
 unsigned int nextRndmMove = 8000;
 int idlePositions[] = {neckLeft, 0, neckRight};
 const int numPositions = sizeof(idlePositions) / sizeof(idlePositions[0]);
@@ -34,7 +34,7 @@ Servo beakServo;
 
 #define FPSerial Serial1
 DFRobotDFPlayerMini myDFPlayer;
-unsigned int volume = 30; // volume range from 0 to 30
+unsigned int volume = 15; // volume range from 0 to 30
 
 #define PIN 16 // Define the pin connected to the WS2812 LED
 #define NUMPIXELS 1 // Number of LEDs in the strip
@@ -130,8 +130,8 @@ void neckSpeedSlow() {
 }
 
 void neckSpeedFast() {
-	stepper1.setMaxSpeed(10000.0);
-	stepper1.setAcceleration(5000.0);
+	stepper1.setMaxSpeed(9000.0);
+	stepper1.setAcceleration(2000.0);
 	stepper1.setSpeed(5000);
 }
 
@@ -261,11 +261,22 @@ void initializeMotionDetection() {
   	pixels.setPixelColor(0, pixels.Color(0, 0, 64)); // blue
     pixels.show();
 	Serial.println(F("waiting for movement..."));
-  	while (digitalRead(pirPin) == LOW) {
-  		delay(10);
-  	}
-  	pirMillis = millis();
-	Serial.println(F("motion detected."));
+    
+    bool motionDetected = false;
+    unsigned long initTime = millis();
+
+	while (millis() - initTime < 5000) {
+	  if (digitalRead(pirPin) == HIGH) {
+	    Serial.println(F("motion detected."));
+	    motionDetected = true;
+	    break;
+	  }
+	  delay(100);
+	}
+	if (!motionDetected) {
+	  Serial.println(F("no motion detected."));
+	}
+
 }
 
 void printDetail(uint8_t type, int value){
