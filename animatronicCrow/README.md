@@ -9,6 +9,9 @@ who remixed the original model by [YahooJAPAN](https://www.thingiverse.com/yahoo
 My work has been done in [KiCad](https://www.kicad.org/),
 [FreeCAD](https://www.freecad.org/),
 and [Blender](https://www.blender.org/download/releases/4-4/).
+
+I may have extra PCBs available at my cost+shipping. 
+Message me if interested.
 ___
 ## [Crow Printing Instructions](stl/README.md) ##
 ___
