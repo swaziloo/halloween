@@ -32,10 +32,10 @@
 #define BEAK_CLOSED_DEG               55      // Fully closed position
 
 // Audio Settings
-#define DFPLAYER_VOLUME               15      // Volume 0-30
+#define DFPLAYER_VOLUME               22      // Volume 0-30
 
 // Motion Detection Settings
-#define LD1020_ANIMATION_COOLDOWN_MS  9000    // Wait after any animation before checking sensor (LD1020 mode only)
+#define LD1020_ANIMATION_COOLDOWN_MS  7500    // Wait after any animation before checking sensor (LD1020 mode only)
 #define SCOLD_SQUAWK_BLOCK_MS         3000    // Block squawks after scolds and vice-versa
 
 // Idle Behavior Settings
