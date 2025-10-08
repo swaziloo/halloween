@@ -22,7 +22,7 @@
 // ============================================================================
 
 // TEST MODE - Set to true to mirror sensor state with eyes (for debugging)
-#define TEST_MODE                     true   // true: eyes mirror sensor, false: normal blinking
+#define TEST_MODE                     false   // true: eyes mirror sensor, false: normal blinking
 
 // SENSOR TYPE - Choose sensor mode
 #define USE_LD1020                    true   // true: LD1020 radar mode, false: PIR mode
