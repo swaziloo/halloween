@@ -58,10 +58,9 @@ The intent is that one would install only the components needed for a project.
 
 ## Building the CC5x12 ##
 
-I will add a full build guide, but for the time-being, here are a few tips:
 * You do not need to fill the board. It is perfectly acceptable to install only the connections and components you intend to use.
-* If you are installing the USB-C socket, do that first and check the electrical connections. Every other component is easier to hand solder.
-* The RP2040-Zero can be powered by its USB-C connection or the board 5v power, but it will not provide power to the steppers or servos. LEDs, the DFPlayer Mini and sensors draw power from the RP2040-Zero 3V3.
+* If you are installing the USB-C socket, do that first and test the electrical connections. Every other component is easier to hand solder.
+* The RP2040-Zero can be powered by its USB-C connection or the board 5v power, but it will not provide power to the steppers, servos, or DFPlayer (since v1.2). LEDs and sensors draw power from the RP2040-Zero 3V3.
 * The C1 capacitor is intended to smooth out the 5v supply for the board. C2-C6 provide demand power for their nearby stepper or servo. Only install caps for those you intend to connect.
 ___
 
