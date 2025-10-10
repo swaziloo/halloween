@@ -38,10 +38,10 @@ The intent is that one would install only the components needed for a project.
 | 1            |            | RP2040-Zero                                                  | Waveshare or equivalent.                                                                                 |
 | 1            | D2         | 1N5819 Schottky Diode                                        | For RP2040-Zero VCC.                                                                                     |
 | 1            |            | DFPlayer Mini                                                | DFRobot or equivalent.                                                                                   |
-| 4            | C7-C9, C12 | 100nF 50v Ceramic Capacitor (104)                            | (v1.1/v1.2) for DFPlayer Mini 5V, input 5V, ULN2003A.                                                    |
-| 1-2          | C10        | 1µF 50v Ceramic Capacitor (105)                              | For DFPlayer Mini midrange filter.                                                                       |
-| 1-5          | C11        | 220µF 10-16v Electrolytic Capacitor                          | For DFPlayer Mini.                                                                                       |
-| 1            | R6         | 1KΩ Resistor                                                 | (v1.1) for MCU GP0->DFPlayer Mini RX                                                                     |
+| 4            | C7-C9, C12 | 100nF 50v Ceramic Capacitor (104)                            | (v1.1+) for DFPlayer Mini 5V, (v1.2) input 5V, ULN2003A.                                                 |
+| 1-2          | C10        | 1µF 50v Ceramic Capacitor (105)                              | (v1.2) For DFPlayer Mini midrange filter.                                                                |
+| 1-5          | C11        | 220µF 10-16v Electrolytic Capacitor                          | (v1.2) For DFPlayer Mini .                                                                               |
+| 1            | R6         | 1KΩ Resistor                                                 | (v1.1+) for MCU GP0->DFPlayer Mini RX                                                                    |
 | 1-2          |            | ULN2003A                                                     | Stepper driver.                                                                                          |
 | 1-2          |            | IC DIP Socket 16-Pin                                         | For ULN2003A.                                                                                            |
 | 1-2          |            | XH2.54mm 5-Pin Connector                                     | Straight pin for stepper.                                                                                |
