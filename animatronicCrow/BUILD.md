@@ -134,7 +134,7 @@ Open the desired sketch and select 'Upload.'
   * __DFPLAYER_VOLUME__ hypothetical max 30, but actual max depends on power supply, speaker, etc. It's best to test (with test-animations and on battery power if that's how you intend to use it) and if sound drops out, lower until it doesn't.
   * __LD1020_ANIMATION_COOLDOWN_MS__ is your main "how reactive do I want this crow to be?" setting when using radar.
   * __SCOLD_SQUAWK_BLOCK_MS__ is your main "how reactive do I want this crow to be?" setting when using PIR.
-  * __IDLE_MOVE__ and __IDLE_SQUAWK__ settings control how active non-reacting crow will be.
+  * __IDLE_MOVE__ and __IDLE_SQUAWK__ settings control how active a non-reacting crow will be.
   * __BLINK__ controls frequency of blinking.
   * __NECK*__ don't change the range, but adjust the fast speed if needed after testing with test-stepper.
   * __PIN__ definitions change if you aren't using the CC5x12 sensor1, servo1, stepper1, or led1.
