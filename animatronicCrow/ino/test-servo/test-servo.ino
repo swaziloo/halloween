@@ -10,16 +10,18 @@
 // CONFIGURATION - 
 // ============================================================================
 // Servo position settings (in degrees)
-#define BEAK_OPEN_DEG                 0       // Fully open position
-#define BEAK_HALF_DEG                 27      // Half open position
-#define BEAK_CLOSED_DEG               55      // Fully closed position
-#define BEAK_MOVE_INTERVAL_MS         4000    // Interval between servo movements
+#define SERVO_PWM_MIN           544     // default 544: adjust to actual
+#define SERVO_PWM_MAX           2400    // default 2400: adjust to actual
+#define BEAK_OPEN_DEG           0       // Fully open position
+#define BEAK_HALF_DEG           25      // Half open position
+#define BEAK_CLOSED_DEG         50      // Fully closed position
+#define BEAK_MOVE_INTERVAL_MS   4000    // Interval between servo movements
 
 // ============================================================================
 // PIN DEFINITIONS
 // ============================================================================
-#define PIN_SERVO                     2
-#define PIN_LED_EYES                  14
+#define PIN_SERVO               2       // SRV1 (29 on CC5x12 v1.2)
+#define PIN_LED_EYES            14      // LED1
 
 // ============================================================================
 // GLOBAL OBJECTS
@@ -40,7 +42,7 @@ void setup() {
   Serial.println(F("\n--- Servo Test Initializing ---"));
 
   // Attach servo and set initial position
-  beakServo.attach(PIN_SERVO);
+  beakServo.attach(PIN_SERVO, SERVO_PWM_MIN, SERVO_PWM_MAX);
   beakServo.write(targetBeakPos);
   Serial.print(F("Servo initialized to position: "));
   Serial.println(targetBeakPos);

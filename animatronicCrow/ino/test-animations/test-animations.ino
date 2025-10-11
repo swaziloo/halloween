@@ -9,6 +9,8 @@
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
+#define SERVO_PWM_MIN           544     // default 544: adjust to actual
+#define SERVO_PWM_MAX           2400    // default 2400: adjust to actual
 #define BEAK_OPEN_DEG           0       // Fully open position
 #define BEAK_CLOSED_DEG         55      // Fully closed position
 #define DFPLAYER_VOLUME         15      // Volume 0-30 (default)
@@ -19,8 +21,8 @@
 // ============================================================================
 #define PIN_DFPLAYER_TX         0
 #define PIN_DFPLAYER_RX         1
-#define PIN_SERVO               2
-#define PIN_LED_EYES            14
+#define PIN_SERVO               2       // SRV1 (29 on CC5x12 v1.2)
+#define PIN_LED_EYES            14      // LED1
 
 // ============================================================================
 // GLOBAL OBJECTS
@@ -49,7 +51,7 @@ void setup() {
   Serial.println(F("========================================\n"));
   
   // Initialize servo
-  beakServo.attach(PIN_SERVO);
+  beakServo.attach(PIN_SERVO, SERVO_PWM_MIN, SERVO_PWM_MAX);
   closeBeak();
   delay(500);
   Serial.println(F("[Init] Beak servo online"));

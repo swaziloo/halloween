@@ -28,6 +28,8 @@
 #define USE_LD1020                    true   // true: LD1020 radar mode, false: PIR mode
 
 // Servo Settings
+#define SERVO_PWM_MIN                 544     // default 544: adjust to actual
+#define SERVO_PWM_MAX                 2400    // default 2400: adjust to actual
 #define BEAK_OPEN_DEG                 0       // Fully open position
 #define BEAK_CLOSED_DEG               55      // Fully closed position
 
@@ -65,13 +67,13 @@
 // ============================================================================
 #define PIN_DFPLAYER_TX               0
 #define PIN_DFPLAYER_RX               1
-#define PIN_SERVO                     2
-#define PIN_STEPPER_1                 5
+#define PIN_SERVO                     2       // SRV1 (29 on CC5x12 v1.2)
+#define PIN_STEPPER_1                 5       // STEPPER1
 #define PIN_STEPPER_2                 6
 #define PIN_STEPPER_3                 7
 #define PIN_STEPPER_4                 8
-#define PIN_LED_EYES                  14
-#define PIN_MOTION_SENSOR             15
+#define PIN_LED_EYES                  14      // LED1
+#define PIN_MOTION_SENSOR             15      // SNSR1
 #define PIN_NEOPIXEL_POWER            11
 
 // ============================================================================
