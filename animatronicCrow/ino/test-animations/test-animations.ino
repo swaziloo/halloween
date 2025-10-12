@@ -9,8 +9,8 @@
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
-#define SERVO_PWM_MIN           544     // default 544: adjust to actual
-#define SERVO_PWM_MAX           2400    // default 2400: adjust to actual
+#define SERVO_PWM_MIN           1000    // default: adjust to actual
+#define SERVO_PWM_MAX           2000    // default: adjust to actual
 #define BEAK_OPEN_DEG           0       // Fully open position
 #define BEAK_CLOSED_DEG         55      // Fully closed position
 #define DFPLAYER_VOLUME         15      // Volume 0-30 (default)

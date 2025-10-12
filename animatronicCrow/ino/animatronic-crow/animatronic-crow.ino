@@ -1,6 +1,6 @@
 /*
  * Animatronic Crow Controller
- * 
+ *
  * Features:
  * - Dual-core: Core1 monitors motion sensor, Core0 runs animations
  * - Scolding, idle movements, random squawks
@@ -14,7 +14,6 @@
 #include <Servo.h>
 #include <DFRobotDFPlayerMini.h>
 #include <AccelStepper.h>
-#include <Adafruit_NeoPixel.h>
 #include "animations.h"
 
 // ============================================================================
@@ -23,13 +22,14 @@
 
 // TEST MODE - Set to true to mirror sensor state with eyes (for debugging)
 #define TEST_MODE                     false   // true: eyes mirror sensor, false: normal blinking
+#define SHOW_NEOPIXEL_STATUS          false   // true: display status color on RP2040-Zero RGB LED
 
 // SENSOR TYPE - Choose sensor mode
-#define USE_LD1020                    true   // true: LD1020 radar mode, false: PIR mode
+#define USE_LD1020                    true    // true: LD1020 radar mode, false: PIR mode
 
 // Servo Settings
-#define SERVO_PWM_MIN                 544     // default 544: adjust to actual
-#define SERVO_PWM_MAX                 2400    // default 2400: adjust to actual
+#define SERVO_PWM_MIN                 1000    // default: adjust to actual
+#define SERVO_PWM_MAX                 2000    // default: adjust to actual
 #define BEAK_OPEN_DEG                 0       // Fully open position
 #define BEAK_CLOSED_DEG               55      // Fully closed position
 
@@ -41,7 +41,7 @@
 #define SCOLD_SQUAWK_BLOCK_MS         3000    // Block squawks after scolds and vice-versa
 
 // Idle Behavior Settings
-// NOTE: For LD1020 mode, ensure these are > LD1020_ANIMATION_COOLDOWN_MS 
+// NOTE: For LD1020 mode, ensure these are > LD1020_ANIMATION_COOLDOWN_MS
 // to prevent self-triggering from animations
 #define IDLE_MOVE_MIN_MS              9000    // Min time between idle movements (must be > LD1020_ANIMATION_COOLDOWN_MS for LD1020)
 #define IDLE_MOVE_MAX_MS              18000   // Max time between idle movements
@@ -49,7 +49,7 @@
 #define IDLE_SQUAWK_MAX_MS            45000   // Max time between random squawks
 #define IDLE_NECK_MIN_PERCENT         30      // Min percent of range for idle moves
 #define IDLE_NECK_MAX_PERCENT         100     // Max percent of range for idle moves
-      
+
 // Eye Blink Settings
 #define BLINK_DURATION_MS             90      // How long eyes stay closed
 #define BLINK_MIN_INTERVAL_MS         3000    // Min time between blinks
@@ -61,6 +61,7 @@
 #define NECK_SPEED_SLOW_ACCEL         500     // Slow movement acceleration
 #define NECK_SPEED_FAST_MAX           6000    // Fast movement max speed
 #define NECK_SPEED_FAST_ACCEL         6000    // Fast movement acceleration
+#define SCOLD_MOVE_PERCENT            20      // Percent of range to move during scold (+/-)
 
 // ============================================================================
 // PIN DEFINITIONS (def. CC5x12 stepper1, servo1, led1, sensor1)
@@ -82,7 +83,11 @@
 AccelStepper stepper(AccelStepper::HALF4WIRE, PIN_STEPPER_1, PIN_STEPPER_3, PIN_STEPPER_2, PIN_STEPPER_4);
 Servo beakServo;
 DFRobotDFPlayerMini dfPlayer;
+
+#if SHOW_NEOPIXEL_STATUS
+#include <Adafruit_NeoPixel.h>
 Adafruit_NeoPixel statusLED(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
+#endif
 
 // Neck position definitions
 const int NECK_CENTER = 0;
@@ -108,9 +113,9 @@ unsigned long lastIdleSquawkTime = 0;
 unsigned long nextIdleSquawkTime = 0;
 unsigned long lastBlinkTime = 0;
 unsigned long nextBlinkTime = 0;
-unsigned long lastAnimationTime = 0;  
+unsigned long lastAnimationTime = 0;
 unsigned long movementStart = 0;
-unsigned long movementEnd = 0; 
+unsigned long movementEnd = 0;
 
 // Beak animation state
 bool animatingBeak = false;
@@ -125,7 +130,7 @@ unsigned long animationStartTime = 0;
 void setup() {
   Serial.begin(115200);
   delay(5000);
-  
+
   Serial.println(F("\n========================================"));
   Serial.println(F("Crow Animation Controller"));
   if (TEST_MODE) {
@@ -141,33 +146,37 @@ void setup() {
     Serial.println(F("*** PIR SENSOR MODE ***"));
   }
   Serial.println(F("========================================\n"));
-  
-  // Initialize status LED
+
+  // Initialize status LED (conditional)
+  #if SHOW_NEOPIXEL_STATUS
   pinMode(PIN_NEOPIXEL_POWER, OUTPUT);
   digitalWrite(PIN_NEOPIXEL_POWER, HIGH);
   statusLED.begin();
   statusLED.setBrightness(50);
   statusLED.setPixelColor(0, statusLED.Color(0, 50, 0)); // Green - starting
   statusLED.show();
-  
+  #endif
+
   randomSeed(analogRead(A0));
-  
+
   initializeEyes();
   initializeBeak();
   initializeNeck();
   initializeDFPlayer();
   initializeMotionSensor();
-  
+
   // Set initial timing
   nextIdleMoveTime = millis() + random(IDLE_MOVE_MIN_MS, IDLE_MOVE_MAX_MS);
   nextIdleSquawkTime = millis() + random(IDLE_SQUAWK_MIN_MS, IDLE_SQUAWK_MAX_MS);
   nextBlinkTime = millis() + random(BLINK_MIN_INTERVAL_MS, BLINK_MAX_INTERVAL_MS);
-  
+
+  #if SHOW_NEOPIXEL_STATUS
   statusLED.setPixelColor(0, statusLED.Color(0, 0, 0)); // Off
   statusLED.show();
-  
+  #endif
+
   Serial.println(F("\n✓ Initialization complete. Crow is alive!\n"));
-  
+
   // Start Core1 for sensor monitoring
   rp2040.idleOtherCore();
   rp2040.resumeOtherCore();
@@ -193,20 +202,20 @@ void loop1() {
 // ============================================================================
 void loop() {
   unsigned long now = millis();
-  
+
   // Always run stepper (non-blocking)
   stepper.run();
-  
+
   // Always update beak animation if active
   updateBeakAnimation();
-  
+
   // Handle eye behavior based on mode
   if (TEST_MODE) { // Test mode: eyes mirror sensor state
     digitalWrite(PIN_LED_EYES, sensorCurrentlyHigh ? HIGH : LOW);
   } else { // Normal mode: random blinking
     handleBlinking(now);
   }
-  
+
   // LD1020 Mode: Check if cooldown period has elapsed
   bool ld1020Clear = true;
   if (USE_LD1020) {
@@ -214,7 +223,7 @@ void loop() {
     ld1020Clear = (now - moveTime >= LD1020_ANIMATION_COOLDOWN_MS);
     if (!ld1020Clear) return; // Skip other behaviors during cooldown
   }
-  
+
   // Prevent rapidly-repeating squawks and scolds
   bool squawkEnabled = (now - lastAnimationTime >= SCOLD_SQUAWK_BLOCK_MS);
 
@@ -228,7 +237,7 @@ void loop() {
     startScoldSequence();
     return; // Skip other behaviors this loop
   }
-  
+
   // Handle current mode
   switch (currentMode) {
     case MODE_IDLE:
@@ -241,17 +250,15 @@ void loop() {
         movementEnd = millis();
       }
       break;
-      
+
     case MODE_SCOLDING:
       // Wait for animation to complete
       if (!animatingBeak && stepper.distanceToGo() == 0) {
         if (USE_LD1020) {
-          // Enter cooldown mode to wait before checking sensor again
           Serial.print(F("[LD1020] Scold complete, entering "));
           Serial.print(LD1020_ANIMATION_COOLDOWN_MS);
           Serial.println(F("ms cooldown"));
         } else {
-          // PIR will check again after scold cooldown
           Serial.println(F("[PIR] Scold complete, returning to idle"));
         }
         currentMode = MODE_IDLE;
@@ -259,7 +266,7 @@ void loop() {
         movementEnd = millis();
       }
       break;
-      
+
     case MODE_SQUAWKING:
       // Wait for animation to complete
       if (!animatingBeak && stepper.distanceToGo() == 0) {
@@ -269,7 +276,7 @@ void loop() {
         movementEnd = millis();
       }
       break;
-      
+
     case MODE_RESETTING:
       // Wait for neck to center
       if (stepper.distanceToGo() == 0) {
@@ -277,7 +284,6 @@ void loop() {
       }
       break;
   }
-
 }
 
 // ============================================================================
@@ -289,7 +295,7 @@ void initializeEyes() {
   digitalWrite(PIN_LED_EYES, HIGH);
   Serial.println(F("[Init] Eyes online"));
   delay(500);
-  
+
   if (!TEST_MODE) {
     digitalWrite(PIN_LED_EYES, LOW);
     delay(500);
@@ -297,7 +303,7 @@ void initializeEyes() {
 }
 
 void initializeBeak() {
-  beakServo.attach(PIN_SERVO);
+  beakServo.attach(PIN_SERVO, SERVO_PWM_MIN, SERVO_PWM_MAX);
   closeBeak();
   delay(300);
   openBeak();
@@ -309,7 +315,7 @@ void initializeBeak() {
 
 void initializeNeck() {
   setNeckSpeedSlow();
-  
+
   // Center the neck through a calibration sequence
   Serial.println(F("[Init] Centering neck..."));
   stepper.setCurrentPosition(0);
@@ -324,30 +330,36 @@ void initializeNeck() {
   }
   stepper.setCurrentPosition(0);
   Serial.println(F("[Init] Neck centered and online"));
-  
+
   setNeckSpeedFast();
   delay(500);
 }
 
 void initializeDFPlayer() {
+  #if SHOW_NEOPIXEL_STATUS
   statusLED.setPixelColor(0, statusLED.Color(50, 25, 0)); // Orange
   statusLED.show();
-  
+  #endif
+
   Serial1.setTX(PIN_DFPLAYER_TX);
   Serial1.setRX(PIN_DFPLAYER_RX);
   Serial1.begin(9600);
   delay(1000);
-  
+
   if (!dfPlayer.begin(Serial1, true, true)) {
     Serial.println(F("[Init] ✗ DFPlayer Mini failed!"));
+    #if SHOW_NEOPIXEL_STATUS
     statusLED.setPixelColor(0, statusLED.Color(50, 0, 0)); // Red
     statusLED.show();
+    #endif
     delay(2000);
   } else {
     Serial.println(F("[Init] DFPlayer Mini online"));
+    #if SHOW_NEOPIXEL_STATUS
     statusLED.setPixelColor(0, statusLED.Color(50, 0, 50)); // Purple
     statusLED.show();
-    
+    #endif
+
     dfPlayer.volume(DFPLAYER_VOLUME);
     delay(100);
   }
@@ -356,15 +368,17 @@ void initializeDFPlayer() {
 
 void initializeMotionSensor() {
   pinMode(PIN_MOTION_SENSOR, INPUT);
+  #if SHOW_NEOPIXEL_STATUS
   statusLED.setPixelColor(0, statusLED.Color(0, 0, 50)); // Blue
   statusLED.show();
-  
+  #endif
+
   Serial.println(F("[Init] Motion sensor online"));
   Serial.println(F("[Init] Waiting for motion test..."));
-  
+
   unsigned long startTime = millis();
   bool detected = false;
-  
+
   while (millis() - startTime < 5000) {
     if (digitalRead(PIN_MOTION_SENSOR) == HIGH) {
       Serial.println(F("[Init] ✓ Motion detected!"));
@@ -373,11 +387,11 @@ void initializeMotionSensor() {
     }
     delay(100);
   }
-  
+
   if (!detected) {
     Serial.println(F("[Init] No motion detected (this is OK)"));
   }
-  
+
   delay(500);
 }
 
@@ -393,14 +407,14 @@ void handleIdleMode(unsigned long now, bool squawkEnabled, bool ld1020Clear) {
     // Randomly choose slow or fast movement
     if (random(0, 2) == 0) setNeckSpeedFast();
     else setNeckSpeedSlow();
-    
+
     // Generate random position: 30-100% of range in either direction
     int rangePercent = random(IDLE_NECK_MIN_PERCENT, IDLE_NECK_MAX_PERCENT + 1);
     int direction = random(0, 2) == 0 ? 1 : -1;  // Left or right
     int targetPos = (NECK_SIDE * rangePercent / 100) * direction;
-    
+
     stepper.moveTo(targetPos);
-    
+
     Serial.print(F("[Idle] Moving neck to "));
     Serial.print(targetPos);
     Serial.print(F(" ("));
@@ -408,7 +422,7 @@ void handleIdleMode(unsigned long now, bool squawkEnabled, bool ld1020Clear) {
     Serial.println(F("% range)"));
     currentMode = MODE_IDLE_MOVE;
     movementStart = now;
-    
+
     nextIdleMoveTime = now + random(IDLE_MOVE_MIN_MS, IDLE_MOVE_MAX_MS);
   }
 
@@ -423,8 +437,17 @@ void startScoldSequence() {
   Serial.println(F("\n[Scold] Motion detected! Scolding..."));
   currentMode = MODE_SCOLDING;
   movementStart = millis();
-  // Reset neck to center
-  resetNeckToCenter();
+
+  // Move neck to +/- 20% position
+  setNeckSpeedFast();
+  int direction = random(0, 2) == 0 ? 1 : -1;
+  int scoldPos = (NECK_SIDE * SCOLD_MOVE_PERCENT / 100) * direction;
+  stepper.moveTo(scoldPos);
+
+  Serial.print(F("  Head turn to "));
+  Serial.print(scoldPos);
+  Serial.println(F(" (scold position)"));
+
   // Choose random scold sound (tracks 1-7)
   animateAudio(random(1, 8));
 }
@@ -455,7 +478,7 @@ void resetNeckToCenter() {
   stepper.stop();
   setNeckSpeedFast();
   stepper.moveTo(NECK_CENTER);
-  
+
   // Wait for completion
   while (stepper.distanceToGo() != 0) {
     stepper.run();
@@ -485,22 +508,22 @@ void startBeakAnimation(BeakKeyframe* animation, uint8_t numFrames) {
   currentKeyframe = 0;
   animationStartTime = millis();
   animatingBeak = true;
-  
+
   // Set initial position
   setBeakPosition(animation[0].position);
 }
 
 void updateBeakAnimation() {
   if (!animatingBeak || currentAnimation == nullptr) return;
-  
+
   unsigned long elapsed = millis() - animationStartTime;
-  
+
   // Check if we need to advance to next keyframe
   if (currentKeyframe < totalKeyframes) {
     if (elapsed >= currentAnimation[currentKeyframe].timeMs) {
       setBeakPosition(currentAnimation[currentKeyframe].position);
       currentKeyframe++;
-      
+
       // Check if animation is complete
       if (currentKeyframe >= totalKeyframes) {
         animatingBeak = false;
@@ -517,9 +540,9 @@ void updateBeakAnimation() {
 void animateAudio(uint8_t trackNum) {
   Serial.print(F("[Audio] Playing track "));
   Serial.println(trackNum);
-  
+
   dfPlayer.play(trackNum);
-  
+
   // Find and start corresponding animation
   for (int i = 0; i < sizeof(soundAnimations) / sizeof(SoundAnimation); i++) {
     if (soundAnimations[i].trackNum == trackNum) {
@@ -536,7 +559,7 @@ void animateAudio(uint8_t trackNum) {
 void handleBlinking(unsigned long now) {
   static bool eyesOpen = true;
   static unsigned long blinkStartTime = 0;
-  
+
   if (eyesOpen) {
     // Check if it's time to blink
     if (now >= nextBlinkTime) {

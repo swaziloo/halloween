@@ -75,7 +75,7 @@ Install using the library manager in the Arduino IDE.
 * Enable the *Waveshare RP2040-Zero* board in the board manager.
 * Connect power to one of the 5v inputs and the RP2040-Zero to your pc. 
 * Select the connected device/port and ensure the Waveshare RP2040-Zero board is assigned.
-* Copy the [BoardTest.ino](BoardTest.ino) sketch into the IDE.
+* Open the [BoardTest](BoardTest) sketch with the Arduino IDE.
 * Set 'true' for available components at the top of the sketch. 
 * Select the 'Upload' button.
 * The sketch should compile, the board should initialize, and a test loop should run.
