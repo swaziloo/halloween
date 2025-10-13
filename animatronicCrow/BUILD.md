@@ -29,26 +29,28 @@ CC5x12 provides multiple options for powering the 5v rail.
 ***You must only ever connect one of them at a time***.
 The RP2040-Zero can be plugged into power (including your computer) while the 5v rail is also receiving power.
 
-| Qty          | Part                              | Note                                                         |
-|--------------|-----------------------------------|--------------------------------------------------------------|
-| 1            | RP2040-Zero                       | Waveshare or equivalent.                                     |
-| 1            | DFPlayer Mini                     | DFRobot or equivalent.                                       |
-| 1            | 100nF 50v Ceramic Capacitor (104) | (v1.1) for DFPlayer Mini 3V3                                 |
-| 1            | 1KΩ Resistor                      | (v1.1) for MCU GP0->DFPlayer Mini RX                         |
-| 1            | IC DIP Socket 16-Pin              | For ULN2003A.                                                |
-| 1            | ULN2003A                          |                                                              |
-| 1            | XH2.54mm 5-Pin Connector          | Straight pin for stepper.                                    |
-| 1            | 1N5819 Schottky Diode             | For RP2040-Zero VCC.                                         |
-| 1 (optional) | 3mm LED                           | For power rail indicator.                                    |
-| 1 (optional) | Resistor for above LED            | I used 2.2kΩ for a blue 3mm LED.                             |
-| 1            | Resistor for Eye LEDs             | I used a 2.2kΩ for a pair of red 5mm LEDs wired in parallel. |
-| 1            | 1uF 50v Ceramic Capacitor (105)   | For ULN2003A (mislabelled on v1.0 silk).                     |
-| 2            | 100uF 16v Electrolytic Capacitor  | For servo and stepper.                                       |
-| 1            | 1000uF 16v Electrolytic Capacitor | For 5v rail.                                                 |
-| 1 (optional) | 5.5x2.1MM DC-005 Power Jack       | If using a 5v/3A adapter.                                    |
-| 1 (optional) | USB-C 6-pin Surface Mount         | If using a USB battery.                                      |
-| 2 (optional  | 5.1kΩ Resistors                   | If using a USB battery.                                      |
-| optional     | 2.54mm Pin Headers                | If not soldering wires directly to board.                    |
+| Qty          | Part                                | Note                                                                      |
+|--------------|-------------------------------------|---------------------------------------------------------------------------|
+| 1            | RP2040-Zero                         | Waveshare or equivalent.                                                  |
+| 1            | DFPlayer Mini                       | DFRobot or equivalent.                                                    |
+| 3            | 100nF 50v Ceramic Capacitor (104)   | (v1.1+) for DFPlayer Mini VCC, (v1.2) input 5V, ULN2003A.                 |
+| 1            | 1µF 50v Ceramic Capacitor (105)     | (v1.2) For DFPlayer Mini midrange filter.                                 |
+| 1            | 220µF 10-16v Electrolytic Capacitor | (v1.2) For DFPlayer Mini ([or to modify prior versions](MaxVolBodge.md)). |
+| 1            | 1KΩ Resistor                        | (v1.1+) for MCU GP0->DFPlayer Mini RX                                     |
+| 1            | IC DIP Socket 16-Pin                | For ULN2003A.                                                             |
+| 1            | ULN2003A                            |                                                                           |
+| 1            | XH2.54mm 5-Pin Connector            | Straight pin for stepper.                                                 |
+| 1            | 1N5819 Schottky Diode               | For RP2040-Zero VCC.                                                      |
+| 1 (optional) | 3mm LED                             | For power rail indicator.                                                 |
+| 1 (optional) | Resistor for above LED              | I used 2.2kΩ for a blue 3mm LED.                                          |
+| 1            | Resistor for Eye LEDs               | I used a 2.2kΩ for a pair of red 5mm LEDs wired in parallel.              |
+| 1            | 1uF 50v Ceramic Capacitor (105)     | For ULN2003A (mislabelled on v1.0 silk).                                  |
+| 2            | 100uF 16v Electrolytic Capacitor    | For servo and stepper.                                                    |
+| 1            | 1000uF 16v Electrolytic Capacitor   | For 5v rail.                                                              |
+| 1 (optional) | 5.5x2.1MM DC-005 Power Jack         | If using a 5v/3A adapter.                                                 |
+| 1 (optional) | USB-C 6-pin Surface Mount           | If using a USB battery.                                                   |
+| 2 (optional  | 5.1kΩ Resistors                     | If using a USB battery.                                                   |
+| optional     | 2.54mm Pin Headers                  | If not soldering wires directly to board.                                 |
 
 ___
 ## Head ##
