@@ -25,20 +25,20 @@
 #define SHOW_NEOPIXEL_STATUS          false   // true: display status color on RP2040-Zero RGB LED
 
 // SENSOR TYPE - Choose sensor mode
-#define USE_LD1020                    true    // true: LD1020 radar mode, false: PIR mode
+#define USE_LD1020                    false    // true: LD1020 radar mode, false: PIR mode
 
 // Servo Settings
 #define SERVO_PWM_MIN                 1000    // default: adjust to actual
 #define SERVO_PWM_MAX                 2000    // default: adjust to actual
 #define BEAK_OPEN_DEG                 0       // Fully open position
-#define BEAK_CLOSED_DEG               55      // Fully closed position
+#define BEAK_CLOSED_DEG               52      // Fully closed position
 
 // Audio Settings
 #define DFPLAYER_VOLUME               22      // Volume 0-30
 
 // Motion Detection Settings
 #define LD1020_ANIMATION_COOLDOWN_MS  7500    // Wait after any animation before checking sensor (LD1020 mode only)
-#define SCOLD_SQUAWK_BLOCK_MS         3000    // Block squawks after scolds and vice-versa
+#define SCOLD_SQUAWK_BLOCK_MS         5000    // Block squawks after scolds and vice-versa
 
 // Idle Behavior Settings
 // NOTE: For LD1020 mode, ensure these are > LD1020_ANIMATION_COOLDOWN_MS
@@ -61,7 +61,7 @@
 #define NECK_SPEED_SLOW_ACCEL         500     // Slow movement acceleration
 #define NECK_SPEED_FAST_MAX           6000    // Fast movement max speed
 #define NECK_SPEED_FAST_ACCEL         6000    // Fast movement acceleration
-#define SCOLD_MOVE_PERCENT            20      // Percent of range to move during scold (+/-)
+#define NECK_RANGE_SCOLD_PERCENT      20      // Percent of range to move during scold (+/-)
 
 // ============================================================================
 // PIN DEFINITIONS (def. CC5x12 stepper1, servo1, led1, sensor1)
@@ -113,7 +113,7 @@ unsigned long lastIdleSquawkTime = 0;
 unsigned long nextIdleSquawkTime = 0;
 unsigned long lastBlinkTime = 0;
 unsigned long nextBlinkTime = 0;
-unsigned long lastAnimationTime = 0;
+unsigned long lastAudioTime = 0;
 unsigned long movementStart = 0;
 unsigned long movementEnd = 0;
 
@@ -225,7 +225,7 @@ void loop() {
   }
 
   // Prevent rapidly-repeating squawks and scolds
-  bool squawkEnabled = (now - lastAnimationTime >= SCOLD_SQUAWK_BLOCK_MS);
+  bool squawkEnabled = (now - lastAudioTime >= SCOLD_SQUAWK_BLOCK_MS);
 
   // Scold when triggered and available
   if (currentMode != MODE_SCOLDING && sensorCurrentlyHigh && !animatingBeak && squawkEnabled && ld1020Clear) {
@@ -262,7 +262,7 @@ void loop() {
           Serial.println(F("[PIR] Scold complete, returning to idle"));
         }
         currentMode = MODE_IDLE;
-        lastAnimationTime = millis();
+        lastAudioTime = millis();
         movementEnd = millis();
       }
       break;
@@ -272,7 +272,7 @@ void loop() {
       if (!animatingBeak && stepper.distanceToGo() == 0) {
         currentMode = MODE_IDLE;
         Serial.println(F("[Idle] Squawk complete, returning to idle"));
-        lastAnimationTime = millis();
+        lastAudioTime = millis();
         movementEnd = millis();
       }
       break;
@@ -437,11 +437,13 @@ void startScoldSequence() {
   Serial.println(F("\n[Scold] Motion detected! Scolding..."));
   currentMode = MODE_SCOLDING;
   movementStart = millis();
+  lastAudioTime = millis();
 
   // Move neck to +/- 20% position
-  setNeckSpeedFast();
+  setNeckSpeedFast();    
+  int rangePercent = random(0, NECK_RANGE_SCOLD_PERCENT + 1);
   int direction = random(0, 2) == 0 ? 1 : -1;
-  int scoldPos = (NECK_SIDE * SCOLD_MOVE_PERCENT / 100) * direction;
+  int scoldPos = (NECK_SIDE * rangePercent / 100) * direction;
   stepper.moveTo(scoldPos);
 
   Serial.print(F("  Head turn to "));
@@ -456,6 +458,7 @@ void startIdleSquawk() {
   Serial.println(F("\n[Squawk] Random squawk..."));
   currentMode = MODE_SQUAWKING;
   movementStart = millis();
+  lastAudioTime = millis();
   // Choose random squawk sound (tracks 8-14)
   animateAudio(random(8, 15));
 }
