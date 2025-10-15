@@ -8,7 +8,7 @@ A 3D printable crow model that turns its head, blinks LED eyes, moves its beak a
 
 ___
 ## [Creature Control PCB](creatureControl/README.md) ##
-[![The Creature Control 5x12 PCB](creatureControl/images/cc5x12-003.png)](creatureControl/README.md)
+[![The Creature Control 5x12 PCB](creatureControl/images/cc5x12-004.png)](creatureControl/README.md)
 
 A PCB to make building animated projects easier to put together.
 
