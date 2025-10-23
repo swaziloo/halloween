@@ -1,8 +1,7 @@
-![Crow parts everywhere](images/AniCrow030.jpg)
 # Build Guide #
 ___
 ## Parts List: ##
-
+![Crow parts everywhere](images/AniCrow030.jpg)
 ### Crow ###
 
 | Qty | Part                       | Note                                                                                                                               |
@@ -23,6 +22,8 @@ ___
 | 8   | 10 x 3mm magnets           | Neodymium high strength magnets for attaching tail to body.                                                                        |
 |     | Hot Glue                   | Black preferred.                                                                                                                   |
 |     | Polyfill                   | Just a little for sound dampening in the speaker housing.                                                                          |
+
+![Crow modules in a Creature Control 5x12 PCB](images/AniCrow071.jpg)
 
 ### [Creature Control 5x12](../creatureControl/README.md) ###
 Note that the CC5x12 board will not be fully filled for this project.
