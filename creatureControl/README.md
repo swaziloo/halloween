@@ -32,7 +32,7 @@ update schema.
 *The 5 volt power rail allows for multiple source connections but only one should be used at any given time.* 
 *Do not connect more than one 5 volt source to the power rail!*
 (Unless you really know what you're doing.)
-It is safe to connect the power to the 5v rail and the RP2040-Zero to your PC at the same time--in fact it's necessary for testing.
+It is safe to connect the power to the 5v rail and the RP2040-Zero to your PC at the same time&mdash;in fact it's necessary for testing.
 ### Parts List ###
 The intent is that one would install only the components needed for a project.
 
@@ -64,7 +64,7 @@ The intent is that one would install only the components needed for a project.
 * You do not need to fill the board. It is perfectly acceptable to install only the connections and components you intend to use.
 * If you are installing the USB-C socket, do that first and test the electrical connections. Every other component is easier to hand solder.
 * The RP2040-Zero can be powered by its USB-C connection or the board 5v power, but it will not provide power to the steppers, servos, or DFPlayer (since v1.2). LEDs and sensors draw power from the RP2040-Zero 3V3.
-* The C1 capacitor is intended to smooth out the 5v supply for the board. C2-C6 provide demand power for their nearby stepper or servo. Only install caps for those you intend to connect.
+* The C1 capacitor is intended to smooth out the 5v supply for the board. C2-C6 & C11 provide demand power for their nearby stepper, servo, or DFPlayer Mini. Only install these caps for the components you intend to connect.
 ___
 
 ## Testing ##

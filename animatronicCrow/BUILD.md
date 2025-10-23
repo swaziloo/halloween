@@ -1,5 +1,4 @@
 # Build Guide #
-___
 ## Parts List: ##
 ![Crow parts everywhere](images/AniCrow030.jpg)
 ### Crow ###
