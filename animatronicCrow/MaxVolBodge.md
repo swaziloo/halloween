@@ -1,5 +1,7 @@
 ### Bodge for Max Volume PCB 1.0 & 1.1 ###
-(You don't need this for v1.2+ boards)
+(You don't need to do any of this on v1.2+ boards)
+
+:de: [Crow Guides in German](https://github.com/padpumpkin/animatronicCrow-de)
 
 | Step | Simple Bodge v1.0 or v1.1    | This is my go-to for both v1.0 and v1.1 since I don't hear any noise or buzzing through the tiny 3-watt speaker without the ceramic caps.                                                                                          |
 |---|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
