@@ -14,9 +14,14 @@ I may have extra PCBs available at my cost+shipping.
 Message me if interested.
 ___
 ## [Crow Printing Instructions](stl/README.md) ##
-___
+Details for printing the models.
+
 ## [Crow Build Guide](BUILD.md) ##
-___
+How-to guide for building your crow.
+
+### :de: [Crow Guides in German](https://github.com/padpumpkin/animatronicCrow-de) ###
+Deutsche Übersetzung der Anleitungen dank padpumpkin.
+
 ![New beak/head in the foreground.](images/AniCrow011.jpg)
 ### Modifications and model sources: ###
 

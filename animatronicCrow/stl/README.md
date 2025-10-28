@@ -1,4 +1,6 @@
 # 3D Printing #
+:de: [Crow Guides in German](https://github.com/padpumpkin/animatronicCrow-de)
+
 Print in the orientation shown in the images below. 
 Consider PETG for a more weather resistant material, but note that the model is not designed to be weatherproof.
 

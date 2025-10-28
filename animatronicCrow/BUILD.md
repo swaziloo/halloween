@@ -1,4 +1,6 @@
 # Build Guide #
+:de: [Crow Guides in German](https://github.com/padpumpkin/animatronicCrow-de)
+
 ## Parts List: ##
 ![Crow parts everywhere](images/AniCrow030.jpg)
 ### Crow ###
@@ -21,6 +23,8 @@
 | 8   | 10 x 3mm magnets           | Neodymium high strength magnets for attaching tail to body.                                                                        |
 |     | Hot Glue                   | Black preferred.                                                                                                                   |
 |     | Polyfill                   | Just a little for sound dampening in the speaker housing.                                                                          |
+
+---
 
 ![Crow modules in a Creature Control 5x12 PCB](images/AniCrow071.jpg)
 
