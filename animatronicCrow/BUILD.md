@@ -42,7 +42,7 @@ The RP2040-Zero can be plugged into power (including your computer) while the 5v
 | 1            | 1µF 50v Ceramic Capacitor (105)     | (v1.2) For DFPlayer Mini midrange filter.                                 |
 | 1            | 220µF 10-16v Electrolytic Capacitor | (v1.2) For DFPlayer Mini ([or to modify prior versions](MaxVolBodge.md)). |
 | 1            | 1KΩ Resistor                        | (v1.1+) for MCU GP0->DFPlayer Mini RX                                     |
-| 1            | IC DIP Socket 16-Pin                | For ULN2003A.                                                             |
+| 1 (optional) | IC DIP Socket 16-Pin                | For ULN2003A. Or just solder directly to the board.                       |
 | 1            | ULN2003A                            |                                                                           |
 | 1            | XH2.54mm 5-Pin Connector            | Straight pin for stepper.                                                 |
 | 1            | 1N5819 Schottky Diode               | For RP2040-Zero VCC.                                                      |
@@ -136,6 +136,7 @@ Connect your RP2040-Zero to your PC, select the connected device, and assign the
 Open the desired sketch and select 'Upload.'
 
 ### Sketches ###
+*Note that Arduino expects the animations.h file to be in the same folder as the animatrnoic-crow or test-animations sketches.*
 * [animatronic-crow](ino/animatronic-cros): The main software for your bird. You'll need to know the volume, stepper speed, and beak closed degrees so you can configure this for your particular crow. When connected to a PC, updates are sent to the Arduino Serial Monitor.
   * __TEST_MODE__ when set to true will illuminate the eyes whenever the sensor senses movement. Helpful for adjusting timeouts.
   * __SENSOR_MODE__ set to one of the following values:

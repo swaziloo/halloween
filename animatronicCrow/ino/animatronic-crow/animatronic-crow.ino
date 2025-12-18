@@ -36,14 +36,14 @@
 #define SERVO_PWM_MIN                 1000    // default: adjust to actual
 #define SERVO_PWM_MAX                 2000    // default: adjust to actual
 #define BEAK_OPEN_DEG                 0       // Fully open position
-#define BEAK_CLOSED_DEG               53      // Fully closed position
+#define BEAK_CLOSED_DEG               45      // Fully closed position
 
 // Audio Settings
-#define DFPLAYER_VOLUME               20       // Volume 0-30
+#define DFPLAYER_VOLUME               20      // Volume 0-30
 
 // Motion Detection Settings
-#define LD1020_ANIMATION_COOLDOWN_MS  7500    // Wait after any animation before checking sensor (LD1020 mode only)
-#define SCOLD_SQUAWK_BLOCK_MS         9000   // Delay squawks after scolds and vice-versa
+#define LD1020_ANIMATION_COOLDOWN_MS  8500    // Wait after any animation before checking sensor (LD1020 mode only)
+#define SCOLD_SQUAWK_BLOCK_MS         5000    // Delay squawks after scolds and vice-versa
 
 // Idle Behavior Settings
 // NOTE: For LD1020 mode, ensure these are > LD1020_ANIMATION_COOLDOWN_MS
@@ -73,7 +73,7 @@
 // ============================================================================
 #define PIN_DFPLAYER_TX               0
 #define PIN_DFPLAYER_RX               1
-#define PIN_SERVO                     2       // SRV1 (29 on CC5x12 v1.2)
+#define PIN_SERVO                     29      // SRV1 (2 on CC5x12 <= v1.1)
 #define PIN_STEPPER_1                 5       // STEPPER1
 #define PIN_STEPPER_2                 6
 #define PIN_STEPPER_3                 7

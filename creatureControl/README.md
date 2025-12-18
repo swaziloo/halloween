@@ -36,28 +36,28 @@ It is safe to connect the power to the 5v rail and the RP2040-Zero to your PC at
 ### Parts List ###
 The intent is that one would install only the components needed for a project.
 
-| Qty          | Ref        | Part                                                         | Note                                                                                                     |
-|--------------|------------|--------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
-| 1            |            | RP2040-Zero                                                  | Waveshare or equivalent.                                                                                 |
-| 1            | D2         | 1N5819 Schottky Diode                                        | For RP2040-Zero VCC.                                                                                     |
-| 1            |            | DFPlayer Mini                                                | DFRobot or equivalent.                                                                                   |
-| 3-4          | C7-C9, C12 | 100nF 50v Ceramic Capacitor (104)                            | (v1.1+) for DFPlayer Mini 5V, (v1.2) input 5V, ULN2003A.                                                 |
-| 1            | C10        | 1µF 50v Ceramic Capacitor (105)                              | (v1.2) For DFPlayer Mini midrange filter.                                                                |
-| 1            | C11        | 220µF 10-16v Electrolytic Capacitor                          | (v1.2) For DFPlayer Mini .                                                                               |
-| 1            | R6         | 1KΩ Resistor                                                 | (v1.1+) for MCU GP0->DFPlayer Mini RX                                                                    |
-| 1-2          |            | ULN2003A                                                     | Stepper driver.                                                                                          |
-| 1-2          |            | IC DIP Socket 16-Pin                                         | For ULN2003A.                                                                                            |
-| 1-2          |            | XH2.54mm 5-Pin Connector                                     | Straight pin for stepper.                                                                                |
-| 1 (optional) | D1         | 3mm LED                                                      | For power rail indicator.                                                                                |
-| 1 (optional) | R3         | Resistor for power indicator LED                             | I used 2.2kΩ for a blue 3mm LED.                                                                         |
-| 1-2          | R4,R5      | Resistor for external LEDs                                   | Based on LED(s) to be used.                                                                              |
-| 1-5          | C2-C6      | 100µF 10-16v Electrolytic Capacitor                          | One for each 5v servo and stepper.                                                                       |
-| 1            | C1         | 1000µF 10-16v Electrolytic Capacitor                         | For 5v rail.                                                                                             |
-| 1 (optional) | J2         | 5.5x2.1MM DC-005 Power Jack                                  | If using a 5v/3A adapter.                                                                                |
-| 1 (optional) | J1         | USB-C 6-pin Surface Mount                                    | If using a USB battery.                                                                                  |
-| 2 (optional) | R1,R2      | 5.1kΩ Resistors                                              | If using a USB battery.                                                                                  |
-| 1 (optional) | J3         | KF350-2P 3.5mm Pitch 2Pin PCB Screw Terminal Block Connector | If using a wired 5v source or drain. Also useful if needing to share ground with an external power rail. |
-| optional     |            | 2.54mm Pin Headers                                           | For board connections.                                                                                   |
+| Qty            | Ref        | Part                                                         | Note                                                                                                     |
+|----------------|------------|--------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| 1              |            | RP2040-Zero                                                  | Waveshare or equivalent.                                                                                 |
+| 1              | D2         | 1N5819 Schottky Diode                                        | For RP2040-Zero VCC.                                                                                     |
+| 1              |            | DFPlayer Mini                                                | DFRobot or equivalent.                                                                                   |
+| 3-4            | C7-C9, C12 | 100nF 50v Ceramic Capacitor (104)                            | (v1.1+) for DFPlayer Mini 5V, (v1.2) input 5V, ULN2003A.                                                 |
+| 1              | C10        | 1µF 50v Ceramic Capacitor (105)                              | (v1.2) For DFPlayer Mini midrange filter.                                                                |
+| 1              | C11        | 220µF 10-16v Electrolytic Capacitor                          | (v1.2) For DFPlayer Mini .                                                                               |
+| 1              | R6         | 1KΩ Resistor                                                 | (v1.1+) for MCU GP0->DFPlayer Mini RX                                                                    |
+| 1-2            |            | ULN2003A                                                     | Stepper driver.                                                                                          |
+| 1-2 (optional) |            | IC DIP Socket 16-Pin                                         | For ULN2003A. Or just solder directly to the board.                                                      |
+| 1-2            |            | XH2.54mm 5-Pin Connector                                     | Straight pin for stepper.                                                                                |
+| 1 (optional)   | D1         | 3mm LED                                                      | For power rail indicator.                                                                                |
+| 1 (optional)   | R3         | Resistor for power indicator LED                             | I used 2.2kΩ for a blue 3mm LED.                                                                         |
+| 1-2            | R4,R5      | Resistor for external LEDs                                   | Based on LED(s) to be used.                                                                              |
+| 1-5            | C2-C6      | 100µF 10-16v Electrolytic Capacitor                          | One for each 5v servo and stepper.                                                                       |
+| 1              | C1         | 1000µF 10-16v Electrolytic Capacitor                         | For 5v rail.                                                                                             |
+| 1 (optional)   | J2         | 5.5x2.1MM DC-005 Power Jack                                  | If using a 5v/3A adapter.                                                                                |
+| 1 (optional)   | J1         | USB-C 6-pin Surface Mount                                    | If using a USB battery.                                                                                  |
+| 2 (optional)   | R1,R2      | 5.1kΩ Resistors                                              | If using a USB battery.                                                                                  |
+| 1 (optional)   | J3         | KF350-2P 3.5mm Pitch 2Pin PCB Screw Terminal Block Connector | If using a wired 5v source or drain. Also useful if needing to share ground with an external power rail. |
+| optional       |            | 2.54mm Pin Headers                                           | For board connections.                                                                                   |
 
 ## Building the CC5x12 ##
 

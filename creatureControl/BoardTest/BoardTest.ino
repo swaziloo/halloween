@@ -12,7 +12,7 @@
 // ============================================================================
 // CONFIGURATION - Enable/Disable Components Here
 // ============================================================================
-#define ENABLE_NEOPIXEL_STATUS false    // Set false for boards without onboard RGB LED
+#define ENABLE_NEOPIXEL_STATUS true    // Set false for boards without onboard RGB LED
 #define ENABLE_LED1            true    // LED on GP14 triggered by SENSOR1
 #define ENABLE_LED2            false   // LED on GP13 triggered by SENSOR2
 #define ENABLE_SENSOR1         true    // Sensor on GP15
@@ -26,7 +26,7 @@
 
 // Test settings
 #define STEPPER_TEST_STEPS     400     // Steps per test cycle
-#define MP3_VOLUME             15      // Volume range 0-30
+#define MP3_VOLUME             10      // Volume range 0-30
 #define MP3_TEST_DELAY         5000    // Milliseconds Delay after playing MP3
 #define SERVO_TEST_DELAY       1000    // Milliseconds delay at each position
 #define SERVO1_PWM_MIN         1000    // default: adjust to actualS

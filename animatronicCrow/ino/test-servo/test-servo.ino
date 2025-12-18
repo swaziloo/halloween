@@ -14,13 +14,13 @@
 #define SERVO_PWM_MAX           2000    // default: adjust to actual
 #define BEAK_OPEN_DEG           0       // Fully open position
 #define BEAK_HALF_DEG           25      // Half open position
-#define BEAK_CLOSED_DEG         55      // Fully closed position
+#define BEAK_CLOSED_DEG         50      // Fully closed position
 #define BEAK_MOVE_INTERVAL_MS   4000    // Interval between servo movements
 
 // ============================================================================
 // PIN DEFINITIONS
 // ============================================================================
-#define PIN_SERVO               2       // SRV1 (29 on CC5x12 v1.2)
+#define PIN_SERVO               29      // SRV1 (2 on CC5x12 <= v1.1)
 #define PIN_LED_EYES            14      // LED1
 
 // ============================================================================
