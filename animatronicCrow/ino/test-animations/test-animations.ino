@@ -21,7 +21,7 @@
 // ============================================================================
 #define PIN_DFPLAYER_TX         0
 #define PIN_DFPLAYER_RX         1
-#define PIN_SERVO               2       // SRV1 (29 on CC5x12 v1.2)
+#define PIN_SERVO               29      // SRV1 (2 on CC5x12 <= v1.1)
 #define PIN_LED_EYES            14      // LED1
 
 // ============================================================================

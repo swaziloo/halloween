@@ -69,7 +69,7 @@
 #define NECK_RANGE_SCOLD_PERCENT      20      // Percent of range to move during scold (+/-)
 
 // ============================================================================
-// PIN DEFINITIONS (default CC5x12 v1.0-v1.1 stepper1, servo1, led1, sensor1)
+// PIN DEFINITIONS (default CC5x12 v1.2 stepper1, servo1, led1, sensor1)
 // ============================================================================
 #define PIN_DFPLAYER_TX               0
 #define PIN_DFPLAYER_RX               1
