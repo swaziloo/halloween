@@ -8,7 +8,8 @@
  * - Non-blocking stepper control
  * - Random eye blinking
  * - Test mode for sensor debugging
- * - LD1020 mode with animation cooldown to prevent self-triggering
+ * - LD1020 mode enables animation cooldown to prevent self-triggering
+ * - BUTTON mode for "Try Me" functionality
  */
 #include <Arduino.h>
 #include <Servo.h>
@@ -20,6 +21,7 @@
 #define SENSOR_MODE_PIR               0
 #define SENSOR_MODE_LD1020            1
 #define SENSOR_MODE_NONE              2
+#define SENSOR_MODE_BUTTON            3 // connect button to PIN_MOTION_SENSOR/GND
 
 // ============================================================================
 // CONFIGURATION - Adjust behavior here
@@ -30,7 +32,7 @@
 #define SHOW_NEOPIXEL_STATUS          false   // true: display status color on RP2040-Zero RGB LED
 
 // SENSOR MODE - Choose one mode
-#define SENSOR_MODE                   SENSOR_MODE_NONE // Choose: SENSOR_MODE_PIR, SENSOR_MODE_LD1020, SENSOR_MODE_NONE
+#define SENSOR_MODE                   SENSOR_MODE_BUTTON // Choose: SENSOR_MODE_PIR, SENSOR_MODE_LD1020, SENSOR_MODE_BUTTON, SENSOR_MODE_NONE
 
 // Servo Settings
 #define SERVO_PWM_MIN                 1000    // default: adjust to actual
@@ -46,8 +48,8 @@
 #define SCOLD_SQUAWK_BLOCK_MS         5000    // Delay squawks after scolds and vice-versa
 
 // Idle Behavior Settings
-// NOTE: For LD1020 mode, ensure these are > LD1020_ANIMATION_COOLDOWN_MS
-// to prevent self-triggering from animations
+// NOTE: For LD1020 mode, ensure these are > LD1020_ANIMATION_COOLDOWN_MS to prevent self-triggering from animations
+// NOTE: For BUTTON mode, most of these timers are ignored
 #define IDLE_MOVE_MIN_MS              9000    // Min time between idle movements (must be > LD1020_ANIMATION_COOLDOWN_MS for LD1020)
 #define IDLE_MOVE_MAX_MS              18000   // Max time between idle movements
 #define IDLE_SQUAWK_MIN_MS            15000   // Min time between random squawks (or scolds without sensor)
@@ -62,7 +64,7 @@
 
 // Neck Movement Settings
 #define NECK_RANGE                    1400    // Total range of motion
-#define NECK_SPEED_SLOW_MAX           4000    // Slow movement max speed
+#define NECK_SPEED_SLOW_MAX           3250    // Slow movement max speed
 #define NECK_SPEED_SLOW_ACCEL         500     // Slow movement acceleration
 #define NECK_SPEED_FAST_MAX           6000    // Fast movement max speed
 #define NECK_SPEED_FAST_ACCEL         4000    // Fast movement acceleration
@@ -110,6 +112,12 @@ enum CrowMode {
 };
 
 volatile bool sensorCurrentlyHigh = false;
+volatile bool buttonDefaultState = HIGH;
+volatile bool buttonTriggered = false;
+bool buttonSequenceActive = false;
+unsigned long buttonWaitMs = 0;
+unsigned long lastButtonStepTime = 0;
+uint8_t buttonStep = 0;
 
 CrowMode currentMode = MODE_IDLE;
 unsigned long lastIdleMoveTime = 0;
@@ -149,6 +157,8 @@ void setup() {
     Serial.println(F("ms"));
   } else if (SENSOR_MODE == SENSOR_MODE_PIR ) {
     Serial.println(F("*** PIR SENSOR MODE ***"));
+  } else if (SENSOR_MODE == SENSOR_MODE_BUTTON) {
+    Serial.println(F("*** BUTTON MODE ***"));
   } else {
     Serial.println(F("*** NO SENSOR CONFIGURED ***"));
   }
@@ -185,7 +195,7 @@ void setup() {
   statusLED.show();
   #endif
 
-  Serial.println(F("\n✓ Initialization complete. Crow is alive!\n"));
+  Serial.println(F("✓ Initialization complete. Crow is alive!"));
 }
 
 // ============================================================================
@@ -203,8 +213,34 @@ void loop1() {
     delay(1000); // Just sleep forever
     return;
   }
-  sensorCurrentlyHigh = digitalRead(PIN_MOTION_SENSOR);
-  delay(50); // Debounce
+  
+  const unsigned long DEBOUNCE_MS = 50;
+  if (SENSOR_MODE == SENSOR_MODE_BUTTON) {
+    // Button mode: Detect state changes (debounced)
+    static bool lastState = buttonDefaultState;
+    static unsigned long lastChangeTime = 0;
+    
+    bool currentState = digitalRead(PIN_MOTION_SENSOR);
+    
+    // Detect change from default state (button pressed)
+    if (currentState != buttonDefaultState && currentState != lastState) {
+      if (millis() - lastChangeTime > DEBOUNCE_MS) {
+        if (!buttonSequenceActive) {
+          buttonTriggered = true;
+          // Serial.println(F("[Button] Press detected by Core1"));
+        }
+        lastChangeTime = millis();
+      }
+    }
+    
+    lastState = currentState;
+    delay(DEBOUNCE_MS);
+    
+  } else {
+    // PIR or LD1020 mode: Monitor for HIGH state
+    sensorCurrentlyHigh = digitalRead(PIN_MOTION_SENSOR);
+    delay(DEBOUNCE_MS);
+  }
 }
 
 // ============================================================================
@@ -212,12 +248,28 @@ void loop1() {
 // ============================================================================
 void loop() {
   unsigned long now = millis();
-
-  // Always run stepper (non-blocking)
+  // Always run stepper and beak updates (non-blocking)
   stepper.run();
-
-  // Always update beak animation if active
   updateBeakAnimation();
+
+  // BUTTON MODE: Handle button sequence
+  if (SENSOR_MODE == SENSOR_MODE_BUTTON) {    
+    // Handle blinking in test mode or during sequence
+    if (TEST_MODE) {
+      digitalWrite(PIN_LED_EYES, buttonTriggered ? HIGH : LOW);
+    } else if (buttonSequenceActive) {
+      handleBlinking(now);
+    }
+    
+    // Check for button trigger
+    if (buttonTriggered && !buttonSequenceActive) {
+      lastButtonStepTime = millis();
+      buttonStep = 0;
+    }
+    executeButtonSequence(now);
+    return; // Skip all other mode logic
+  }
+
 
   // Handle eye behavior based on mode
   if (TEST_MODE) { // Test mode: eyes mirror sensor state
@@ -386,37 +438,151 @@ void initializeDFPlayer() {
 }
 
 void initializeMotionSensor() {
-  pinMode(PIN_MOTION_SENSOR, INPUT);
-  #if SHOW_NEOPIXEL_STATUS
-  statusLED.setPixelColor(0, statusLED.Color(0, 0, 50)); // Blue
-  statusLED.show();
-  #endif
-
-  Serial.println(F("[Init]   Motion sensor online"));
-  Serial.println(F("[Init]   Waiting for motion test..."));
-
-  unsigned long startTime = millis();
-  bool detected = false;
-
-  while (millis() - startTime < 5000) {
-    if (digitalRead(PIN_MOTION_SENSOR) == HIGH) {
-      Serial.println(F("[Init]   ✓ Motion detected!"));
-      detected = true;
-      break;
+  if (SENSOR_MODE == SENSOR_MODE_BUTTON) {
+    // Button mode: Use INPUT_PULLUP and detect default state
+    pinMode(PIN_MOTION_SENSOR, INPUT_PULLUP);
+    delay(100); // Let pin stabilize
+    
+    buttonDefaultState = digitalRead(PIN_MOTION_SENSOR);
+    
+    #if SHOW_NEOPIXEL_STATUS
+    statusLED.setPixelColor(0, statusLED.Color(0, 0, 50)); // Blue
+    statusLED.show();
+    #endif
+    
+    Serial.println(F("[Init]   Button sensor online (INPUT_PULLUP)"));
+    Serial.print(F("[Init]   Button default state: "));
+    Serial.println(buttonDefaultState == HIGH ? "HIGH (NO)" : "LOW (NC)");
+    Serial.println(F("[Init]   Waiting for button press test..."));
+    
+    unsigned long startTime = millis();
+    bool detected = false;
+    
+    while (millis() - startTime < 5000) {
+      if (digitalRead(PIN_MOTION_SENSOR) != buttonDefaultState) {
+        Serial.println(F("[Init]   ✓ Button press detected!"));
+        detected = true;
+        // Wait for release
+        while (digitalRead(PIN_MOTION_SENSOR) != buttonDefaultState) {
+          delay(50);
+        }
+        break;
+      }
+      delay(100);
     }
-    delay(100);
+    
+    if (!detected) {
+      Serial.println(F("[Init]   No button press detected (this is OK)"));
+    }
+    
+  } else {
+    // PIR or LD1020 mode: Standard INPUT
+    pinMode(PIN_MOTION_SENSOR, INPUT);
+    
+    #if SHOW_NEOPIXEL_STATUS
+    statusLED.setPixelColor(0, statusLED.Color(0, 0, 50)); // Blue
+    statusLED.show();
+    #endif
+    
+    Serial.println(F("[Init]   Motion sensor online"));
+    Serial.println(F("[Init]   Waiting for motion test..."));
+    
+    unsigned long startTime = millis();
+    bool detected = false;
+    
+    while (millis() - startTime < 5000) {
+      if (digitalRead(PIN_MOTION_SENSOR) == HIGH) {
+        Serial.println(F("[Init]   ✓ Motion detected!"));
+        detected = true;
+        break;
+      }
+      delay(100);
+    }
+    
+    if (!detected) {
+      Serial.println(F("[Init]   No motion detected (this is OK)"));
+    }
   }
-
-  if (!detected) {
-    Serial.println(F("[Init]   No motion detected (this is OK)"));
-  }
-
+  
   delay(500);
 }
 
 // ============================================================================
 // MODE HANDLERS
 // ============================================================================
+
+void executeButtonSequence(unsigned long now) {
+  if (buttonTriggered) {
+    if (!buttonSequenceActive) {
+      buttonSequenceActive = true;
+      Serial.println(F("[Button] ===== STARTING BUTTON SEQUENCE ====="));
+    }
+    
+    // Check if we need to wait before advancing
+    if (now - lastButtonStepTime < buttonWaitMs) return;
+
+    switch(buttonStep)  {
+    case 0:
+      Serial.println(F("[Button] Eyes ON"));
+      digitalWrite(PIN_LED_EYES, HIGH);
+      nextBlinkTime = now + random(BLINK_MIN_INTERVAL_MS, BLINK_MAX_INTERVAL_MS);
+      buttonWaitMs = 800;
+      lastButtonStepTime = now;
+      buttonStep++;
+      break;
+    case 1:
+      Serial.println(F("[Button] Scolding"));
+      startScoldSequence();
+      buttonStep++;
+      break;
+    case 2:
+      if (!animatingBeak && stepper.distanceToGo() == 0) {
+        buttonWaitMs = random(1000,3000);
+        lastButtonStepTime = now;
+        buttonStep++;
+      }
+      break;
+    case 3:
+      Serial.println(F("[Button] Movement"));
+      startIdleMove(now);
+      buttonStep++;
+      break;
+    case 4:
+      if (stepper.distanceToGo() == 0) {
+        buttonWaitMs = random(1200, 2400);
+        lastButtonStepTime = now;
+        buttonStep++;
+      }
+      break;
+    case 5:
+      Serial.println(F("[Button] Squawk"));
+      animateAudio(random(8,15));
+      buttonStep++;
+      break;
+    case 6:
+      if (!animatingBeak && stepper.distanceToGo() == 0) {
+        buttonWaitMs = random(1000,3000);
+        lastButtonStepTime = now;
+        buttonStep++;
+      }
+      break;
+    case 7:
+      Serial.println(F("[Button] Centering Neck"));
+      setNeckSpeedSlow();
+      stepper.moveTo(NECK_CENTER);
+      buttonStep++;
+    case 8:
+      if (stepper.distanceToGo() == 0) {
+        Serial.println(F("[Button] Eyes OFF"));
+        digitalWrite(PIN_LED_EYES, LOW);
+        Serial.println(F("[Button] ===== SEQUENCE COMPLETE ====="));
+        buttonSequenceActive = false;
+        buttonTriggered = false;
+      }
+      break;
+    }
+  }
+}
 
 void handleIdleMode(unsigned long now, bool squawkEnabled, bool ld1020Clear) {
 
@@ -432,27 +598,8 @@ void handleIdleMode(unsigned long now, bool squawkEnabled, bool ld1020Clear) {
         return;
       }
     }
-
-    // Randomly choose slow or fast movement
-    if (random(0, 2) == 0) setNeckSpeedFast();
-    else setNeckSpeedSlow();
-
-    // Generate random position: 30-100% of range in either direction
-    int rangePercent = random(IDLE_NECK_MIN_PERCENT, IDLE_NECK_MAX_PERCENT + 1);
-    int direction = random(0, 2) == 0 ? 1 : -1;  // Left or right
-    int targetPos = (NECK_SIDE * rangePercent / 100) * direction;
-
-    stepper.moveTo(targetPos);
-
-    Serial.print(F("[Idle]   Moving neck to "));
-    Serial.print(targetPos);
-    Serial.print(F(" ("));
-    Serial.print(rangePercent);
-    Serial.println(F("% range)"));
-    currentMode = MODE_IDLE_MOVE;
-    movementStart = now;
-
-    resetIdleMoveTime();
+    // Trigger idle movement 
+    startIdleMove(now);
   }
 
   // Random idle squawks
@@ -487,6 +634,29 @@ void startIdleSquawk() {
   lastAudioTime = millis();
   // Choose random squawk sound (tracks 8-14)
   animateAudio(random(8, 15));
+}
+
+void startIdleMove(unsigned long now) {
+  // Randomly choose slow or fast movement
+  if (random(0, 2) == 0) setNeckSpeedFast();
+  else setNeckSpeedSlow();
+
+  // Generate random position: 30-100% of range in either direction
+  int rangePercent = random(IDLE_NECK_MIN_PERCENT, IDLE_NECK_MAX_PERCENT + 1);
+  int direction = random(0, 2) == 0 ? 1 : -1;  // Left or right
+  int targetPos = (NECK_SIDE * rangePercent / 100) * direction;
+
+  stepper.moveTo(targetPos);
+
+  Serial.print(F("[Idle]   Moving neck to "));
+  Serial.print(targetPos);
+  Serial.print(F(" ("));
+  Serial.print(rangePercent);
+  Serial.println(F("% range)"));
+  currentMode = MODE_IDLE_MOVE;
+  movementStart = now;
+
+  resetIdleMoveTime();
 }
 
 void resetIdleTimers() {

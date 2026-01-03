@@ -2,60 +2,32 @@
 :de: [Crow Guides in German](https://github.com/padpumpkin/animatronicCrow-de)
 
 Print in the orientation shown in the images below. 
-Consider PETG for a more weather resistant material, but note that the model is not designed to be weatherproof.
+Consider PETG for a more weather resistant material, but note that the model is not fully weatherproof.
 
-### Needed for Printing ###
-
-| Qty | Part                   | Note                        |
-|-----|------------------------|-----------------------------|
-| 8   | 10x3 Neodymium Magnets | For the tail-to-body mount. |
-|     | Cyanoacrylic Glue      | For the magnet shims.       |
-
-## Important Note: ##
-The magnet mount holes are sealed and will require you to pause during printing to install them.
-The spaces are 3.5mm tall, so for example, at a 0.16mm layer height, I have to pause on layer 25.
-
-*Measure your magnets.*
-Mine are 2.66mm tall, so taking that away from 3.5mm and leaving a little slack, I scale the Z axis of the 1.0mm shims (yellow arrows below) to 80%.
-
-Magnets must be installed with the correct polarity!
-Mark the Tail and Body sides so you don't get confused.
-I add a touch of CA glue to the shim and stick one onto each magnet before resuming the print.
-
-![Magnets inserted and shims being glued](../images/AniCrow028.jpg)
-
-## Second Note: ##
+## Note: ##
 The crow body is designed to be printed with minimal supports (only for the "ankles").
-My slicer (Bambu) wants to generate an enormous support to catch the tiny top of the PCB mount.
-I highlight it "do not support" and save some filament.
+If your slicer wants to generate an enormous support to catch the tiny top of the PCB mount you should mark it "do not support" and save some filament.
 
 ![No need for printed support here](../images/AniCrow029.png)
 
-On a related note, I do need to support the sloping underside of the beak. YMMV.
+On a related note, I do prefer to support the sloping underside of the beak. 
+The [.3mf](https://makerworld.com/en/models/1869791-animatronic-halloween-crow) includes these settings.
 
-## Third Note: ##
+## Second Note: ##
 The stepper collar slides against the stepper plate.
-I print these two pieces (green arrows below) with ironing on to help smooth the surface.
+I print the collar with ironing on to help smooth the surface.
 After printing, I sand both the dome mounts on the body plate and the sliding surface on the collar to 800 grit.
 Add dry lube to both before assembly.
 
-# Crow with PIR Sensor Window #
-![PIR Crow STL Files for 3D printing](../images/AniCrow026.png)
+# Printing #
+I find that PETG printed with a 0.4mm nozzle and 0.16mm layer height provides a strong build and a shiny appearance like bird feathers at the expense of a long print.
 
-### PIR Components in Green Circles ###
-* *Not Pictured:* The beak actuator.  *(Recommend printing with 0.2mm nozzle.)*
-* A holder for the PIR sensor. *(Recommend printing with 0.2mm nozzle.)*
-* An internal cover (to prevent the sensor from seeing the crow move its head from the inside).
-* Crow body with PIR window cutout.
-* An oval for covering the PIR window.
-* Feet with or without holes will work--the holes are for a zip tie or wire attachment.
+|                                                                 |                                                                                                     |
+|-----------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ![PIR Crow STL Files for 3D printing](../images/AniCrow072.jpg) | Print all parts on the first plate for all builds. Turn on ironing for the top of the collar. Consider the seam on the lower portion of the head (I like to align it right down the middle). The speaker ring and tail screw tab are optional, though I recommend both.             |
+| ![PIR Crow STL Files for 3D printing](../images/AniCrow073.jpg) | The crow body with no hole is used for non-PIR builds.                                                                                                                                                                                                                              |
+| ![PIR Crow STL Files for 3D printing](../images/AniCrow074.jpg) | The body with the PIR hole can be used for a regular, white-lens Mini-PIR or with a replacement small black lens. You need the Small Fresnel Holder *or* the Mini-PIR Holder&mdash;not both. The PIR Plug can be used to close the PIR Hole if you decide to use another/no sensor. |
+| ![PIR Crow STL Files for 3D printing](../images/AniCrow075.jpg) | The actuator, spacer, and sensor holders are best printed with a 0.2mm nozzle and a "strength" setting (I prefer 0.10mm layer height).                                                                                                                                              |
 
-# Crow with No Sensor or Radar Sensor #
-![Crow STL Files for 3D printing](../images/AniCrow027.png)
-
-* *Not Pictured:* The beak actuator.  *(Recommend printing with 0.2mm nozzle.)*
-* *Not Pictured:* A radar mount belongs in the green circle (will update once I have the LD1020 in hand).
-* Crow body with NO window cutout.
-* Feet with or without holes will work--the holes are for a zip tie or wire attachment.
 
 
