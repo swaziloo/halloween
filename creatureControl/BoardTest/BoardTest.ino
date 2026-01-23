@@ -53,9 +53,9 @@
 #define STEPPER2_PIN2          10
 #define STEPPER2_PIN3          11
 #define STEPPER2_PIN4          12
-#define SERVO1_PIN             2       // 29 on v1.2+
-#define SERVO2_PIN             3       // 28 on v1.2+
-#define SERVO3_PIN             4       // 27 on v1.2+
+#define SERVO1_PIN             29      // 2 prior to v1.2
+#define SERVO2_PIN             28      // 3 prior to v1.2
+#define SERVO3_PIN             27      // 4 prior to v1.2
 #define NEOPIXEL_PIN           16      // Onboard RGB LED
 #define NEOPIXEL_POWER         11      // Onboard RGB power pin
 
