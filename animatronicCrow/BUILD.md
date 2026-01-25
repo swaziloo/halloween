@@ -11,7 +11,7 @@
 | 1   | SG90 5v Servo                   | MG90S also works.                                                                                                                               |
 | 1   | 28BYJ-48 5v Stepper             | If using CC5x12 stepper control you do not need the breakout board (though you could transfer those components to the CC5x12).                  |
 | 1   | 40mm 4Ω, 3w Speaker             | 8Ω will work. Consider a waterproof speaker if the crow will be left outdoors. A paper cone speaker is the weakest component in wet conditions. |
-| 3   | M2.6 x 8mm tapping screws       | For attaching the speaker flange.
+| 3   | M2.6 x 10mm tapping screws      | For attaching the speaker flange.
 | 1   | Micro SD Card                   | For the mp3 audio files.                                                                                                                        |
 | 1   | HC-SR312 AM312 Mini PIR         | Optional. Human motion (directional) sensor.                                                                                                    |
 | 1   | 8006 Fresnel Lens (Black)       | Optional. Small lens replacement for the Mini PIR sensor. 
