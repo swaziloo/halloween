@@ -4,7 +4,7 @@
  * Util for direct manipulation of crow functions using the Ardunio Serial Monitor.
  * Enter '?' for command summary. 
  * 
- * Minimal crow setup requires correctly setting PWM (beak servo) range and (probably) volume.
+ * Minimal crow setup requires correctly setting PWM (beak servo) range and (probably) volume
  * 
  * >> "User Configuration" is located in settings.h <<
  * 
@@ -44,7 +44,6 @@ TestState currentNeckState = NONE;
 int stepperMoveIdx = 0;
 
 bool eyesMirrorSensor = false;
-unsigned long nextSensorRead = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -75,7 +74,7 @@ void loop() {
   updateNeck();
   // Stepper Run Always
   stepper.run();
-  if (eyesMirrorSensor && now > nextSensorRead) {
+  if (eyesMirrorSensor) {
     digitalWrite(PIN_LED_EYES, digitalRead(PIN_MOTION_SENSOR));
   } 
 
@@ -221,14 +220,13 @@ void updateNeck() {
         case 1: 
           if (stepper.distanceToGo() == 0) {
             stepper.setCurrentPosition(0);
-            stepper.moveTo(-(NECK_RANGE/2)+50);
+            stepper.moveTo(-(NECK_RANGE / 2 + 50));
             stepperMoveIdx++;
           }
           break;
         case 2:
           if (stepper.distanceToGo() == 0) {
             stepper.setCurrentPosition(0);
-            stepperMoveIdx = 0;
             currentNeckState = NONE;
           }
           break;

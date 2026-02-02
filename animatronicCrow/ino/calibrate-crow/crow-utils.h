@@ -15,7 +15,7 @@ static uint8_t lastSentPWM = -1;
 
 /**
  * Handles the logic of attaching/detaching the servo and updating 
- * its position based on the easing math in animations.h
+ * its position
  */
 bool updateBeak() {
   int targetPWM = getEasedAnimPWM();
@@ -34,6 +34,5 @@ bool updateBeak() {
   }
   return false;
 }
-
 
 #endif

@@ -9,7 +9,7 @@
 // ============================================================================
 #define PIN_DFPLAYER_TX               0
 #define PIN_DFPLAYER_RX               1
-#define PIN_SERVO                     2     // SRV1 (2 on CC5x12 <= v1.1)
+#define PIN_SERVO                     29    // SRV1 (2 on CC5x12 <= v1.1)
 #define PIN_STEPPER_1                 5     // STEPPER1
 #define PIN_STEPPER_2                 6
 #define PIN_STEPPER_3                 7
@@ -25,14 +25,21 @@
 // SENSOR MODE - Choose one mode: SENSOR_MODE_PIR, SENSOR_MODE_LD1020, SENSOR_MODE_BUTTON, SENSOR_MODE_NONE
 #define SENSOR_MODE                   SENSOR_MODE_PIR
 
+/**
+ * Setting the beak range changed with software in Feb 2026.
+ * Old defaults were PWM 1000/2000 with a 0-45 or 50 range.
+ * If you wish to mimic those settings, set:
+ * SERVO_PWM_OPEN   1000
+ * SERVO_PWM_CLOSED 1250
+ */
 // Servo Settings
-#define SERVO_PWM_OPEN                1125  // fully open PWM
-#define SERVO_PWM_CLOSED              1415  // fully closed PWM
-#define SERVO_EASING_FACTOR           4.0   // determines animation smooting (smaller is smoother)
+#define SERVO_PWM_OPEN                1000  // fully open PWM
+#define SERVO_PWM_CLOSED              1250  // fully closed PWM
+#define SERVO_EASING_FACTOR           3.00  // determines animation smooting (smaller is smoother)
 
 // Audio Settings
-#define DFPLAYER_VOLUME               26   	// Volume 0-30
-#define AUDIO_SYNC_DELAY_MS	          65    // sync delay
+#define DFPLAYER_VOLUME               25  	// Volume 0-30
+#define AUDIO_SYNC_DELAY_MS	          100   // sync delay
 
 // Motion Detection Settings
 #define LD1020_ANIMATION_COOLDOWN_MS  8500  // Wait after any animation before checking sensor (LD1020 mode only)
