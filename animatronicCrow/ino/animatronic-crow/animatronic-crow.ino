@@ -1,91 +1,37 @@
 /*
  * Animatronic Crow Controller
+ * ---------------------------
  *
  * Features:
  * - Dual-core: Core1 monitors motion sensor, Core0 runs animations
  * - Scolding, idle movements, random squawks
  * - Synchronized beak animations with audio files
- * - Non-blocking stepper control
+ * - Non-blocking control
  * - Random eye blinking
  * - Test mode for sensor debugging
  * - LD1020 mode enables animation cooldown to prevent self-triggering
  * - BUTTON mode for "Try Me" functionality
+ * 
+ * >> "User Configuration" is located in settings.h <<
+ * 
  */
 #include <Arduino.h>
 #include <Servo.h>
 #include <DFRobotDFPlayerMini.h>
 #include <AccelStepper.h>
-#include "animations.h"
 
 // SENSOR MODE CODES - Do not modify these values
-#define SENSOR_MODE_PIR               0
-#define SENSOR_MODE_LD1020            1
-#define SENSOR_MODE_NONE              2
-#define SENSOR_MODE_BUTTON            3 // connect button to PIN_MOTION_SENSOR/GND
+#define SENSOR_MODE_PIR 0
+#define SENSOR_MODE_LD1020 1
+#define SENSOR_MODE_NONE 2
+#define SENSOR_MODE_BUTTON 3  // connect button to PIN_MOTION_SENSOR/GND
+
+#include "settings.h"
+#include "animations.h"
+#include "crow-utils.h"
 
 // ============================================================================
-// CONFIGURATION - Adjust behavior here
-// ============================================================================
-
-// TEST MODE - Set to true to mirror sensor state with eyes (for debugging)
-#define TEST_MODE                     false   // true: eyes mirror sensor, false: normal blinking
-#define SHOW_NEOPIXEL_STATUS          false   // true: display status color on RP2040-Zero RGB LED
-
-// SENSOR MODE - Choose one mode
-#define SENSOR_MODE                   SENSOR_MODE_BUTTON // Choose: SENSOR_MODE_PIR, SENSOR_MODE_LD1020, SENSOR_MODE_BUTTON, SENSOR_MODE_NONE
-
-// Servo Settings
-#define SERVO_PWM_MIN                 1000    // default: adjust to actual
-#define SERVO_PWM_MAX                 2000    // default: adjust to actual
-#define BEAK_OPEN_DEG                 0       // Fully open position
-#define BEAK_CLOSED_DEG               45      // Fully closed position
-
-// Audio Settings
-#define DFPLAYER_VOLUME               20      // Volume 0-30
-
-// Motion Detection Settings
-#define LD1020_ANIMATION_COOLDOWN_MS  8500    // Wait after any animation before checking sensor (LD1020 mode only)
-#define SCOLD_SQUAWK_BLOCK_MS         5000    // Delay squawks after scolds and vice-versa
-
-// Idle Behavior Settings
-// NOTE: For LD1020 mode, ensure these are > LD1020_ANIMATION_COOLDOWN_MS to prevent self-triggering from animations
-// NOTE: For BUTTON mode, most of these timers are ignored
-#define IDLE_MOVE_MIN_MS              9000    // Min time between idle movements (must be > LD1020_ANIMATION_COOLDOWN_MS for LD1020)
-#define IDLE_MOVE_MAX_MS              18000   // Max time between idle movements
-#define IDLE_SQUAWK_MIN_MS            15000   // Min time between random squawks (or scolds without sensor)
-#define IDLE_SQUAWK_MAX_MS            45000   // Max time between random squawks (or scolds without sensor)
-#define IDLE_NECK_MIN_PERCENT         30      // Min percent of range for idle moves
-#define IDLE_NECK_MAX_PERCENT         100     // Max percent of range for idle moves
-
-// Eye Blink Settings
-#define BLINK_DURATION_MS             90      // How long eyes stay closed
-#define BLINK_MIN_INTERVAL_MS         3000    // Min time between blinks
-#define BLINK_MAX_INTERVAL_MS         8000    // Max time between blinks
-
-// Neck Movement Settings
-#define NECK_RANGE                    1400    // Total range of motion
-#define NECK_SPEED_SLOW_MAX           3250    // Slow movement max speed
-#define NECK_SPEED_SLOW_ACCEL         500     // Slow movement acceleration
-#define NECK_SPEED_FAST_MAX           6000    // Fast movement max speed
-#define NECK_SPEED_FAST_ACCEL         4000    // Fast movement acceleration
-#define NECK_RANGE_SCOLD_PERCENT      20      // Percent of range to move during scold (+/-)
-
-// ============================================================================
-// PIN DEFINITIONS (default CC5x12 v1.2 stepper1, servo1, led1, sensor1)
-// ============================================================================
-#define PIN_DFPLAYER_TX               0
-#define PIN_DFPLAYER_RX               1
-#define PIN_SERVO                     29      // SRV1 (2 on CC5x12 <= v1.1)
-#define PIN_STEPPER_1                 5       // STEPPER1
-#define PIN_STEPPER_2                 6
-#define PIN_STEPPER_3                 7
-#define PIN_STEPPER_4                 8
-#define PIN_LED_EYES                  14      // LED1
-#define PIN_MOTION_SENSOR             15      // SNSR1
-#define PIN_NEOPIXEL_POWER            11
-
-// ============================================================================
-// GLOBAL OBJECTS
+// GLOBAL OBJECTS 
 // ============================================================================
 AccelStepper stepper(AccelStepper::HALF4WIRE, PIN_STEPPER_1, PIN_STEPPER_3, PIN_STEPPER_2, PIN_STEPPER_4);
 Servo beakServo;
@@ -130,19 +76,12 @@ unsigned long lastAudioTime = 0;
 unsigned long movementStart = 0;
 unsigned long movementEnd = 0;
 
-// Beak animation state
-bool animatingBeak = false;
-BeakKeyframe* currentAnimation = nullptr;
-uint8_t currentKeyframe = 0;
-uint8_t totalKeyframes = 0;
-unsigned long animationStartTime = 0;
-
 // ============================================================================
 // SETUP - CORE 0
 // ============================================================================
 void setup() {
   Serial.begin(115200);
-  delay(5000);
+  delay(7500);
 
   Serial.println(F("\n========================================"));
   Serial.println(F("Crow Animation Controller"));
@@ -155,7 +94,7 @@ void setup() {
     Serial.print(F("Animation cooldown: "));
     Serial.print(LD1020_ANIMATION_COOLDOWN_MS);
     Serial.println(F("ms"));
-  } else if (SENSOR_MODE == SENSOR_MODE_PIR ) {
+  } else if (SENSOR_MODE == SENSOR_MODE_PIR) {
     Serial.println(F("*** PIR SENSOR MODE ***"));
   } else if (SENSOR_MODE == SENSOR_MODE_BUTTON) {
     Serial.println(F("*** BUTTON MODE ***"));
@@ -164,15 +103,15 @@ void setup() {
   }
   Serial.println(F("========================================\n"));
 
-  // Initialize status LED (conditional)
-  #if SHOW_NEOPIXEL_STATUS
+// Initialize status LED (conditional)
+#if SHOW_NEOPIXEL_STATUS
   pinMode(PIN_NEOPIXEL_POWER, OUTPUT);
   digitalWrite(PIN_NEOPIXEL_POWER, HIGH);
   statusLED.begin();
   statusLED.setBrightness(50);
-  statusLED.setPixelColor(0, statusLED.Color(0, 50, 0)); // Green - starting
+  statusLED.setPixelColor(0, statusLED.Color(0, 50, 0));  // Green - starting
   statusLED.show();
-  #endif
+#endif
 
   randomSeed(analogRead(A0));
 
@@ -180,6 +119,7 @@ void setup() {
   initializeBeak();
   initializeNeck();
   initializeDFPlayer();
+
   resetIdleTimers();
 
   // Start up sensor and Core1 for monitoring if available
@@ -190,10 +130,10 @@ void setup() {
     rp2040.idleOtherCore();
   }
 
-  #if SHOW_NEOPIXEL_STATUS
-  statusLED.setPixelColor(0, statusLED.Color(0, 0, 0)); // Off
+#if SHOW_NEOPIXEL_STATUS
+  statusLED.setPixelColor(0, statusLED.Color(0, 0, 0));  // Off
   statusLED.show();
-  #endif
+#endif
 
   Serial.println(F("✓ Initialization complete. Crow is alive!"));
 }
@@ -210,32 +150,31 @@ void setup1() {
 // ============================================================================
 void loop1() {
   if (SENSOR_MODE == SENSOR_MODE_NONE) {
-    delay(1000); // Just sleep forever
+    delay(1000);  // Just sleep forever
     return;
   }
-  
+
   const unsigned long DEBOUNCE_MS = 50;
   if (SENSOR_MODE == SENSOR_MODE_BUTTON) {
     // Button mode: Detect state changes (debounced)
     static bool lastState = buttonDefaultState;
     static unsigned long lastChangeTime = 0;
-    
+
     bool currentState = digitalRead(PIN_MOTION_SENSOR);
-    
+
     // Detect change from default state (button pressed)
     if (currentState != buttonDefaultState && currentState != lastState) {
       if (millis() - lastChangeTime > DEBOUNCE_MS) {
         if (!buttonSequenceActive) {
           buttonTriggered = true;
-          // Serial.println(F("[Button] Press detected by Core1"));
         }
         lastChangeTime = millis();
       }
     }
-    
+
     lastState = currentState;
     delay(DEBOUNCE_MS);
-    
+
   } else {
     // PIR or LD1020 mode: Monitor for HIGH state
     sensorCurrentlyHigh = digitalRead(PIN_MOTION_SENSOR);
@@ -248,33 +187,35 @@ void loop1() {
 // ============================================================================
 void loop() {
   unsigned long now = millis();
-  // Always run stepper and beak updates (non-blocking)
+
+  // Always run stepper
   stepper.run();
-  updateBeakAnimation();
+
+  // Animate Beak 
+  updateBeak();
 
   // BUTTON MODE: Handle button sequence
-  if (SENSOR_MODE == SENSOR_MODE_BUTTON) {    
+  if (SENSOR_MODE == SENSOR_MODE_BUTTON) {
     // Handle blinking in test mode or during sequence
     if (TEST_MODE) {
       digitalWrite(PIN_LED_EYES, buttonTriggered ? HIGH : LOW);
     } else if (buttonSequenceActive) {
       handleBlinking(now);
     }
-    
+
     // Check for button trigger
     if (buttonTriggered && !buttonSequenceActive) {
       lastButtonStepTime = millis();
       buttonStep = 0;
     }
     executeButtonSequence(now);
-    return; // Skip all other mode logic
+    return;  // Skip all other mode logic
   }
 
-
   // Handle eye behavior based on mode
-  if (TEST_MODE) { // Test mode: eyes mirror sensor state
+  if (TEST_MODE) {  // Test mode: eyes mirror sensor state
     digitalWrite(PIN_LED_EYES, sensorCurrentlyHigh ? HIGH : LOW);
-  } else { // Normal mode: random blinking
+  } else {  // Normal mode: random blinking
     handleBlinking(now);
   }
 
@@ -283,14 +224,14 @@ void loop() {
   if (SENSOR_MODE == SENSOR_MODE_LD1020) {
     long moveTime = max(movementEnd, movementStart);
     ld1020Clear = (now - moveTime >= LD1020_ANIMATION_COOLDOWN_MS);
-    if (!ld1020Clear) return; // Skip other behaviors during cooldown
+    if (!ld1020Clear) return;  // Skip other behaviors during cooldown
   }
 
   // Prevent rapidly-repeating squawks and scolds
   bool squawkEnabled = (now - lastAudioTime >= SCOLD_SQUAWK_BLOCK_MS);
 
   // Scold when triggered and available
-  if (currentMode != MODE_SCOLDING && sensorCurrentlyHigh && !animatingBeak && squawkEnabled && ld1020Clear) {
+  if (currentMode != MODE_SCOLDING && sensorCurrentlyHigh && !animating && squawkEnabled && ld1020Clear) {
     Serial.println(F("[Scold]  Motion detected! Scolding..."));
     // Interrupt idle neck movement if in progress
     if (currentMode == MODE_IDLE && stepper.distanceToGo() != 0) {
@@ -298,7 +239,7 @@ void loop() {
       stepper.stop();
     }
     startScoldSequence();
-    return; // Skip other behaviors this loop
+    return;  // Skip other behaviors this loop
   }
 
   // Handle current mode
@@ -316,13 +257,7 @@ void loop() {
 
     case MODE_SCOLDING:
       // Wait for animation to complete
-      if (!animatingBeak && stepper.distanceToGo() == 0) {
-        // 5% chance to just keep scolding
-        if (random(0, 20) == 0) {
-          Serial.println(F("[Scold]  Double Down!"));
-          startScoldSequence();
-          break;
-        }
+      if (!animating && stepper.distanceToGo() == 0) {
         if (SENSOR_MODE == SENSOR_MODE_LD1020) {
           Serial.print(F("[LD1020] Scold complete, entering "));
           Serial.print(LD1020_ANIMATION_COOLDOWN_MS);
@@ -340,7 +275,7 @@ void loop() {
 
     case MODE_SQUAWKING:
       // Wait for animation to complete
-      if (!animatingBeak && stepper.distanceToGo() == 0) {
+      if (!animating && stepper.distanceToGo() == 0) {
         currentMode = MODE_IDLE;
         Serial.println(F("[Squawk] Complete. Returning to idle"));
         lastAudioTime = millis();
@@ -374,12 +309,21 @@ void initializeEyes() {
 }
 
 void initializeBeak() {
-  beakServo.attach(PIN_SERVO, SERVO_PWM_MIN, SERVO_PWM_MAX);
-  closeBeak();
-  delay(300);
-  openBeak();
-  delay(300);
-  closeBeak();
+  int mid = (SERVO_PWM_OPEN + SERVO_PWM_CLOSED) / 2;
+  beakServo.writeMicroseconds(mid);  // start center
+  beakServo.attach(PIN_SERVO);
+  delay(200);
+  for (int p = mid; p > SERVO_PWM_OPEN; p--) {  // move open
+    beakServo.writeMicroseconds(p);
+    delay(2);
+  }
+  for (int p = SERVO_PWM_OPEN; p < SERVO_PWM_CLOSED; p++) {  // move closed
+    beakServo.writeMicroseconds(p);
+    delay(2);
+  }
+  beakServo.writeMicroseconds(SERVO_PWM_CLOSED);
+  delay(200);
+  beakServo.detach();
   Serial.println(F("[Init]   Beak servo online"));
   delay(500);
 }
@@ -395,7 +339,7 @@ void initializeNeck() {
     stepper.run();
   }
   stepper.setCurrentPosition(0);
-  stepper.moveTo(-(NECK_RANGE/2+50));
+  stepper.moveTo(-(NECK_RANGE / 2 + 50));
   while (stepper.distanceToGo() != 0) {
     stepper.run();
   }
@@ -407,10 +351,10 @@ void initializeNeck() {
 }
 
 void initializeDFPlayer() {
-  #if SHOW_NEOPIXEL_STATUS
-  statusLED.setPixelColor(0, statusLED.Color(50, 25, 0)); // Orange
+#if SHOW_NEOPIXEL_STATUS
+  statusLED.setPixelColor(0, statusLED.Color(50, 25, 0));  // Orange
   statusLED.show();
-  #endif
+#endif
 
   Serial1.setTX(PIN_DFPLAYER_TX);
   Serial1.setRX(PIN_DFPLAYER_RX);
@@ -419,45 +363,46 @@ void initializeDFPlayer() {
 
   if (!dfPlayer.begin(Serial1, true, true)) {
     Serial.println(F("[Init]   ✗ DFPlayer Mini failed!"));
-    #if SHOW_NEOPIXEL_STATUS
-    statusLED.setPixelColor(0, statusLED.Color(50, 0, 0)); // Red
+#if SHOW_NEOPIXEL_STATUS
+    statusLED.setPixelColor(0, statusLED.Color(50, 0, 0));  // Red
     statusLED.show();
-    #endif
+#endif
     delay(2000);
   } else {
     Serial.println(F("[Init]   DFPlayer Mini online"));
-    #if SHOW_NEOPIXEL_STATUS
-    statusLED.setPixelColor(0, statusLED.Color(50, 0, 50)); // Purple
+#if SHOW_NEOPIXEL_STATUS
+    statusLED.setPixelColor(0, statusLED.Color(50, 0, 50));  // Purple
     statusLED.show();
-    #endif
+#endif
 
     dfPlayer.volume(DFPLAYER_VOLUME);
-    delay(100);
+    delay(200);
+    dfPlayer.play(11);
   }
-  delay(500);
+  delay(2500);
 }
 
 void initializeMotionSensor() {
   if (SENSOR_MODE == SENSOR_MODE_BUTTON) {
     // Button mode: Use INPUT_PULLUP and detect default state
     pinMode(PIN_MOTION_SENSOR, INPUT_PULLUP);
-    delay(100); // Let pin stabilize
-    
+    delay(100);  // Let pin stabilize
+
     buttonDefaultState = digitalRead(PIN_MOTION_SENSOR);
-    
-    #if SHOW_NEOPIXEL_STATUS
-    statusLED.setPixelColor(0, statusLED.Color(0, 0, 50)); // Blue
+
+#if SHOW_NEOPIXEL_STATUS
+    statusLED.setPixelColor(0, statusLED.Color(0, 0, 50));  // Blue
     statusLED.show();
-    #endif
-    
+#endif
+
     Serial.println(F("[Init]   Button sensor online (INPUT_PULLUP)"));
     Serial.print(F("[Init]   Button default state: "));
     Serial.println(buttonDefaultState == HIGH ? "HIGH (NO)" : "LOW (NC)");
     Serial.println(F("[Init]   Waiting for button press test..."));
-    
+
     unsigned long startTime = millis();
     bool detected = false;
-    
+
     while (millis() - startTime < 5000) {
       if (digitalRead(PIN_MOTION_SENSOR) != buttonDefaultState) {
         Serial.println(F("[Init]   ✓ Button press detected!"));
@@ -470,26 +415,26 @@ void initializeMotionSensor() {
       }
       delay(100);
     }
-    
+
     if (!detected) {
       Serial.println(F("[Init]   No button press detected (this is OK)"));
     }
-    
+
   } else {
     // PIR or LD1020 mode: Standard INPUT
     pinMode(PIN_MOTION_SENSOR, INPUT);
-    
-    #if SHOW_NEOPIXEL_STATUS
-    statusLED.setPixelColor(0, statusLED.Color(0, 0, 50)); // Blue
+
+#if SHOW_NEOPIXEL_STATUS
+    statusLED.setPixelColor(0, statusLED.Color(0, 0, 50));  // Blue
     statusLED.show();
-    #endif
-    
+#endif
+
     Serial.println(F("[Init]   Motion sensor online"));
     Serial.println(F("[Init]   Waiting for motion test..."));
-    
+
     unsigned long startTime = millis();
     bool detected = false;
-    
+
     while (millis() - startTime < 5000) {
       if (digitalRead(PIN_MOTION_SENSOR) == HIGH) {
         Serial.println(F("[Init]   ✓ Motion detected!"));
@@ -498,12 +443,12 @@ void initializeMotionSensor() {
       }
       delay(100);
     }
-    
+
     if (!detected) {
       Serial.println(F("[Init]   No motion detected (this is OK)"));
     }
   }
-  
+
   delay(500);
 }
 
@@ -517,69 +462,69 @@ void executeButtonSequence(unsigned long now) {
       buttonSequenceActive = true;
       Serial.println(F("[Button] ===== STARTING BUTTON SEQUENCE ====="));
     }
-    
+
     // Check if we need to wait before advancing
     if (now - lastButtonStepTime < buttonWaitMs) return;
 
-    switch(buttonStep)  {
-    case 0:
-      Serial.println(F("[Button] Eyes ON"));
-      digitalWrite(PIN_LED_EYES, HIGH);
-      nextBlinkTime = now + random(BLINK_MIN_INTERVAL_MS, BLINK_MAX_INTERVAL_MS);
-      buttonWaitMs = 800;
-      lastButtonStepTime = now;
-      buttonStep++;
-      break;
-    case 1:
-      Serial.println(F("[Button] Scolding"));
-      startScoldSequence();
-      buttonStep++;
-      break;
-    case 2:
-      if (!animatingBeak && stepper.distanceToGo() == 0) {
-        buttonWaitMs = random(1000,3000);
+    switch (buttonStep) {
+      case 0:
+        Serial.println(F("[Button] Eyes ON"));
+        digitalWrite(PIN_LED_EYES, HIGH);
+        nextBlinkTime = now + random(BLINK_MIN_INTERVAL_MS, BLINK_MAX_INTERVAL_MS);
+        buttonWaitMs = 800;
         lastButtonStepTime = now;
         buttonStep++;
-      }
-      break;
-    case 3:
-      Serial.println(F("[Button] Movement"));
-      startIdleMove(now);
-      buttonStep++;
-      break;
-    case 4:
-      if (stepper.distanceToGo() == 0) {
-        buttonWaitMs = random(1200, 2400);
-        lastButtonStepTime = now;
+        break;
+      case 1:
+        Serial.println(F("[Button] Scolding"));
+        startScoldSequence();
         buttonStep++;
-      }
-      break;
-    case 5:
-      Serial.println(F("[Button] Squawk"));
-      animateAudio(random(8,15));
-      buttonStep++;
-      break;
-    case 6:
-      if (!animatingBeak && stepper.distanceToGo() == 0) {
-        buttonWaitMs = random(1000,3000);
-        lastButtonStepTime = now;
+        break;
+      case 2:
+        if (!animating && stepper.distanceToGo() == 0) {
+          buttonWaitMs = random(1000, 3000);
+          lastButtonStepTime = now;
+          buttonStep++;
+        }
+        break;
+      case 3:
+        Serial.println(F("[Button] Movement"));
+        startIdleMove(now);
         buttonStep++;
-      }
-      break;
-    case 7:
-      Serial.println(F("[Button] Centering Neck"));
-      setNeckSpeedSlow();
-      stepper.moveTo(NECK_CENTER);
-      buttonStep++;
-    case 8:
-      if (stepper.distanceToGo() == 0) {
-        Serial.println(F("[Button] Eyes OFF"));
-        digitalWrite(PIN_LED_EYES, LOW);
-        Serial.println(F("[Button] ===== SEQUENCE COMPLETE ====="));
-        buttonSequenceActive = false;
-        buttonTriggered = false;
-      }
-      break;
+        break;
+      case 4:
+        if (stepper.distanceToGo() == 0) {
+          buttonWaitMs = random(1200, 2400);
+          lastButtonStepTime = now;
+          buttonStep++;
+        }
+        break;
+      case 5:
+        Serial.println(F("[Button] Squawk"));
+        animateAudio(random(8, 15));
+        buttonStep++;
+        break;
+      case 6:
+        if (!animating && stepper.distanceToGo() == 0) {
+          buttonWaitMs = random(1000, 3000);
+          lastButtonStepTime = now;
+          buttonStep++;
+        }
+        break;
+      case 7:
+        Serial.println(F("[Button] Centering Neck"));
+        setNeckSpeedSlow();
+        stepper.moveTo(NECK_CENTER);
+        buttonStep++;
+      case 8:
+        if (stepper.distanceToGo() == 0) {
+          Serial.println(F("[Button] Eyes OFF"));
+          digitalWrite(PIN_LED_EYES, LOW);
+          Serial.println(F("[Button] ===== SEQUENCE COMPLETE ====="));
+          buttonSequenceActive = false;
+          buttonTriggered = false;
+        }
+        break;
     }
   }
 }
@@ -587,7 +532,7 @@ void executeButtonSequence(unsigned long now) {
 void handleIdleMode(unsigned long now, bool squawkEnabled, bool ld1020Clear) {
 
   // Random neck movements
-  if (ld1020Clear && now >= nextIdleMoveTime && stepper.distanceToGo() == 0 && !animatingBeak) {
+  if (ld1020Clear && now >= nextIdleMoveTime && stepper.distanceToGo() == 0 && !animating) {
 
     // Randomly scold if there is no sensor
     if (SENSOR_MODE == SENSOR_MODE_NONE) {
@@ -598,12 +543,13 @@ void handleIdleMode(unsigned long now, bool squawkEnabled, bool ld1020Clear) {
         return;
       }
     }
-    // Trigger idle movement 
+    // Trigger idle movement and (re)set volume
+    dfPlayer.volume(DFPLAYER_VOLUME);
     startIdleMove(now);
   }
 
   // Random idle squawks
-  if (ld1020Clear && squawkEnabled && now >= nextIdleSquawkTime && !animatingBeak) {
+  if (ld1020Clear && squawkEnabled && now >= nextIdleSquawkTime && !animating) {
     startIdleSquawk();
     resetIdleSquawkTime();
   }
@@ -615,7 +561,7 @@ void startScoldSequence() {
   lastAudioTime = millis();
 
   // Move neck to +/- 20% position
-  setNeckSpeedFast();    
+  setNeckSpeedFast();
   int rangePercent = random(0, NECK_RANGE_SCOLD_PERCENT + 1);
   int direction = random(0, 2) == 0 ? 1 : -1;
   int scoldPos = (NECK_SIDE * rangePercent / 100) * direction;
@@ -702,71 +648,24 @@ void resetNeckToCenter() {
 }
 
 // ============================================================================
-// BEAK CONTROL
-// ============================================================================
-
-void openBeak() {
-  beakServo.write(BEAK_OPEN_DEG);
-}
-
-void closeBeak() {
-  beakServo.write(BEAK_CLOSED_DEG);
-}
-
-void setBeakPosition(uint8_t percent) {
-  // Convert 0-100% to servo angle
-  beakServo.write(map(percent, 0, 100, BEAK_CLOSED_DEG, BEAK_OPEN_DEG));
-}
-
-void startBeakAnimation(BeakKeyframe* animation, uint8_t numFrames) {
-  currentAnimation = animation;
-  totalKeyframes = numFrames;
-  currentKeyframe = 0;
-  animationStartTime = millis();
-  animatingBeak = true;
-
-  // Set initial position
-  setBeakPosition(animation[0].position);
-}
-
-void updateBeakAnimation() {
-  if (!animatingBeak || currentAnimation == nullptr) return;
-
-  unsigned long elapsed = millis() - animationStartTime;
-
-  // Check if we need to advance to next keyframe
-  if (currentKeyframe < totalKeyframes) {
-    if (elapsed >= currentAnimation[currentKeyframe].timeMs) {
-      setBeakPosition(currentAnimation[currentKeyframe].position);
-      currentKeyframe++;
-
-      // Check if animation is complete
-      if (currentKeyframe >= totalKeyframes) {
-        animatingBeak = false;
-        currentAnimation = nullptr;
-      }
-    }
-  }
-}
-
-// ============================================================================
 // AUDIO CONTROL
 // ============================================================================
 
 void animateAudio(uint8_t trackNum) {
-  Serial.print(F("► Audio  Playing track "));
-  Serial.print(trackNum);
-  Serial.print(F(" at time "));
-  Serial.println(millis()/1000);
+  uint8_t idx = trackNum - 1;
 
-  dfPlayer.play(trackNum);
+  if (idx < NUM_ANIMATIONS) {
+    Serial.print(F("► Audio  Playing track "));
+    Serial.print(trackNum);
+    Serial.print(F(" at time "));
+    Serial.println(millis() / 1000);
 
-  // Find and start corresponding animation
-  for (int i = 0; i < sizeof(soundAnimations) / sizeof(SoundAnimation); i++) {
-    if (soundAnimations[i].trackNum == trackNum) {
-      startBeakAnimation(soundAnimations[i].animation, soundAnimations[i].numKeyframes);
-      break;
-    }
+    dfPlayer.play(trackNum);
+
+    // queue animation with delay to get DFPlayer started
+    queuePendingAnimation(idx, millis() + AUDIO_SYNC_DELAY_MS);
+  } else {
+    Serial.println(F("✗ Audio  Track index out of bounds!"));
   }
 }
 
