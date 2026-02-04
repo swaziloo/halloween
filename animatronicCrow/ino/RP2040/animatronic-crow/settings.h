@@ -33,13 +33,13 @@
  * SERVO_PWM_CLOSED 1250
  */
 // Servo Settings
-#define SERVO_PWM_OPEN                1000  // fully open PWM
+#define SERVO_PWM_OPEN                1050  // fully open PWM
 #define SERVO_PWM_CLOSED              1250  // fully closed PWM
 #define SERVO_EASING_FACTOR           3.00  // determines animation smooting (smaller is smoother)
 
 // Audio Settings
-#define DFPLAYER_VOLUME               25  	// Volume 0-30
-#define AUDIO_SYNC_DELAY_MS	          100   // sync delay
+#define DFPLAYER_VOLUME               25    // Volume 0-30
+#define AUDIO_SYNC_DELAY_MS           100   // sync delay
 
 // Motion Detection Settings
 #define LD1020_ANIMATION_COOLDOWN_MS  8500  // Wait after any animation before checking sensor (LD1020 mode only)

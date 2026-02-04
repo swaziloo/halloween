@@ -16,7 +16,7 @@
  * 
  */
 #include <Arduino.h>
-#include <Servo.h>
+#include <ESP32Servo.h>
 #include <DFRobotDFPlayerMini.h>
 #include <AccelStepper.h>
 
@@ -103,83 +103,21 @@ void setup() {
   }
   Serial.println(F("========================================\n"));
 
-// Initialize status LED (conditional)
-#if SHOW_NEOPIXEL_STATUS
-  pinMode(PIN_NEOPIXEL_POWER, OUTPUT);
-  digitalWrite(PIN_NEOPIXEL_POWER, HIGH);
-  statusLED.begin();
-  statusLED.setBrightness(50);
-  statusLED.setPixelColor(0, statusLED.Color(0, 50, 0));  // Green - starting
-  statusLED.show();
-#endif
-
   randomSeed(analogRead(A0));
+  
+  initializeNeopixel();
+  showPixel(0, 50, 0); // NeoPixel: green
 
   initializeEyes();
   initializeBeak();
   initializeNeck();
   initializeDFPlayer();
+  initializeMotionSensor();
 
   resetIdleTimers();
 
-  // Start up sensor and Core1 for monitoring if available
-  if (SENSOR_MODE != SENSOR_MODE_NONE) {
-    initializeMotionSensor();
-    rp2040.resumeOtherCore();
-  } else {
-    rp2040.idleOtherCore();
-  }
-
-#if SHOW_NEOPIXEL_STATUS
-  statusLED.setPixelColor(0, statusLED.Color(0, 0, 0));  // Off
-  statusLED.show();
-#endif
-
+  showPixel(0, 0, 0); // NeoPixel: off
   Serial.println(F("✓ Initialization complete. Crow is alive!"));
-}
-
-// ============================================================================
-// SETUP - CORE 1 (Sensor Monitoring)
-// ============================================================================
-void setup1() {
-  // Core1 setup - sensor monitoring
-}
-
-// ============================================================================
-// LOOP - CORE 1 (Sensor Monitoring Thread)
-// ============================================================================
-void loop1() {
-  if (SENSOR_MODE == SENSOR_MODE_NONE) {
-    delay(1000);  // Just sleep forever
-    return;
-  }
-
-  const unsigned long DEBOUNCE_MS = 50;
-  if (SENSOR_MODE == SENSOR_MODE_BUTTON) {
-    // Button mode: Detect state changes (debounced)
-    static bool lastState = buttonDefaultState;
-    static unsigned long lastChangeTime = 0;
-
-    bool currentState = digitalRead(PIN_MOTION_SENSOR);
-
-    // Detect change from default state (button pressed)
-    if (currentState != buttonDefaultState && currentState != lastState) {
-      if (millis() - lastChangeTime > DEBOUNCE_MS) {
-        if (!buttonSequenceActive) {
-          buttonTriggered = true;
-        }
-        lastChangeTime = millis();
-      }
-    }
-
-    lastState = currentState;
-    delay(DEBOUNCE_MS);
-
-  } else {
-    // PIR or LD1020 mode: Monitor for HIGH state
-    sensorCurrentlyHigh = digitalRead(PIN_MOTION_SENSOR);
-    delay(DEBOUNCE_MS);
-  }
 }
 
 // ============================================================================
@@ -187,12 +125,9 @@ void loop1() {
 // ============================================================================
 void loop() {
   unsigned long now = millis();
-
-  // Always run stepper
   stepper.run();
-
-  // Animate Beak 
   updateBeak();
+  updateSensorState(now);
 
   // BUTTON MODE: Handle button sequence
   if (SENSOR_MODE == SENSOR_MODE_BUTTON) {
@@ -309,9 +244,11 @@ void initializeEyes() {
 }
 
 void initializeBeak() {
+  showPixel(25, 25, 25); // NeoPixel: white
   int mid = (SERVO_PWM_OPEN + SERVO_PWM_CLOSED) / 2;
   beakServo.writeMicroseconds(mid);  // start center
   beakServo.attach(PIN_SERVO);
+  beakServo.setTimerWidth(16);
   delay(200);
   for (int p = mid; p > SERVO_PWM_OPEN; p--) {  // move open
     beakServo.writeMicroseconds(p);
@@ -323,12 +260,12 @@ void initializeBeak() {
   }
   beakServo.writeMicroseconds(SERVO_PWM_CLOSED);
   delay(200);
-  beakServo.detach();
   Serial.println(F("[Init]   Beak servo online"));
   delay(500);
 }
 
 void initializeNeck() {
+  showPixel(0, 50, 25); // NeoPixel: teal
   setNeckSpeedSlow();
 
   // Center the neck through a calibration sequence
@@ -351,29 +288,17 @@ void initializeNeck() {
 }
 
 void initializeDFPlayer() {
-#if SHOW_NEOPIXEL_STATUS
-  statusLED.setPixelColor(0, statusLED.Color(50, 25, 0));  // Orange
-  statusLED.show();
-#endif
-
-  Serial1.setTX(PIN_DFPLAYER_TX);
-  Serial1.setRX(PIN_DFPLAYER_RX);
-  Serial1.begin(9600);
+  showPixel(50, 25, 0); // NeoPixel: orange
+  Serial1.begin(9600, SERIAL_8N1, PIN_DFPLAYER_RX, PIN_DFPLAYER_TX);
   delay(1000);
 
   if (!dfPlayer.begin(Serial1, true, true)) {
     Serial.println(F("[Init]   ✗ DFPlayer Mini failed!"));
-#if SHOW_NEOPIXEL_STATUS
-    statusLED.setPixelColor(0, statusLED.Color(50, 0, 0));  // Red
-    statusLED.show();
-#endif
+    showPixel(50, 0, 0); // NeoPixel: red
     delay(2000);
   } else {
     Serial.println(F("[Init]   DFPlayer Mini online"));
-#if SHOW_NEOPIXEL_STATUS
-    statusLED.setPixelColor(0, statusLED.Color(50, 0, 50));  // Purple
-    statusLED.show();
-#endif
+    showPixel(50, 0, 50); // NeoPixel: purple
 
     dfPlayer.volume(DFPLAYER_VOLUME);
     delay(200);
@@ -389,12 +314,8 @@ void initializeMotionSensor() {
     delay(100);  // Let pin stabilize
 
     buttonDefaultState = digitalRead(PIN_MOTION_SENSOR);
-
-#if SHOW_NEOPIXEL_STATUS
-    statusLED.setPixelColor(0, statusLED.Color(0, 0, 50));  // Blue
-    statusLED.show();
-#endif
-
+    showPixel(0, 0, 50); // NeoPixel: blue
+    
     Serial.println(F("[Init]   Button sensor online (INPUT_PULLUP)"));
     Serial.print(F("[Init]   Button default state: "));
     Serial.println(buttonDefaultState == HIGH ? "HIGH (NO)" : "LOW (NC)");
@@ -420,15 +341,10 @@ void initializeMotionSensor() {
       Serial.println(F("[Init]   No button press detected (this is OK)"));
     }
 
-  } else {
+  } else if (SENSOR_MODE != SENSOR_MODE_NONE) {
     // PIR or LD1020 mode: Standard INPUT
     pinMode(PIN_MOTION_SENSOR, INPUT);
-
-#if SHOW_NEOPIXEL_STATUS
-    statusLED.setPixelColor(0, statusLED.Color(0, 0, 50));  // Blue
-    statusLED.show();
-#endif
-
+    showPixel(0, 0, 50); // blue
     Serial.println(F("[Init]   Motion sensor online"));
     Serial.println(F("[Init]   Waiting for motion test..."));
 
@@ -450,6 +366,16 @@ void initializeMotionSensor() {
   }
 
   delay(500);
+}
+
+void initializeNeopixel() {
+  // Initialize status LED (conditional)
+#if SHOW_NEOPIXEL_STATUS
+  pinMode(PIN_NEOPIXEL_POWER, OUTPUT);
+  digitalWrite(PIN_NEOPIXEL_POWER, HIGH);
+  statusLED.begin();
+  statusLED.setBrightness(50);
+#endif
 }
 
 // ============================================================================
@@ -623,6 +549,39 @@ void addBlockToSquawkTime() {
 }
 
 // ============================================================================
+// SENSOR MONITOR
+// ============================================================================
+void updateSensorState(unsigned long now) {
+  if (SENSOR_MODE == SENSOR_MODE_NONE)  return;
+
+  static unsigned long lastSensorRead = 0;
+  const unsigned long SENSOR_INTERVAL = 50; 
+
+  if (now - lastSensorRead > SENSOR_INTERVAL) {
+    if (SENSOR_MODE == SENSOR_MODE_BUTTON) {
+      // Button mode: Detect state changes (debounced)
+      static bool lastState = buttonDefaultState;
+      static unsigned long lastChangeTime = 0;
+
+      bool currentState = digitalRead(PIN_MOTION_SENSOR);
+      // Detect change from default state (button pressed)
+      if (currentState != buttonDefaultState && currentState != lastState) {
+        if (millis() - lastChangeTime > SENSOR_INTERVAL) {
+          if (!buttonSequenceActive) buttonTriggered = true;
+          lastChangeTime = millis();
+        }
+      }
+      lastState = currentState;
+
+    } else {
+      // PIR or LD1020 mode: Monitor for HIGH state
+      sensorCurrentlyHigh = digitalRead(PIN_MOTION_SENSOR);
+      lastSensorRead = now;
+    }
+  }
+}
+
+// ============================================================================
 // NECK CONTROL
 // ============================================================================
 
@@ -692,4 +651,14 @@ void handleBlinking(unsigned long now) {
       nextBlinkTime = now + random(BLINK_MIN_INTERVAL_MS, BLINK_MAX_INTERVAL_MS);
     }
   }
+}
+
+// ============================================================================
+// NeoPixel (on-board LED) status
+// ============================================================================
+void showPixel(int r, int g, int b) {
+#if SHOW_NEOPIXEL_STATUS
+  statusLED.setPixelColor(0, statusLED.Color(r, g, b));
+  statusLED.show();
+#endif
 }

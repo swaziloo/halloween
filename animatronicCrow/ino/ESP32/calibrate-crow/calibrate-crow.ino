@@ -10,7 +10,7 @@
  * 
  */
 #include <Arduino.h>
-#include <Servo.h>
+#include <ESP32Servo.h>
 #include <DFRobotDFPlayerMini.h>
 #include <AccelStepper.h>
 #include "settings.h"
@@ -53,14 +53,19 @@ void setup() {
   
   printInstructions();
 
+  // configure servo
+  beakServo.attach(PIN_SERVO); 
+  beakServo.setTimerWidth(16);
+
   // Turn on Eye LEDs
   pinMode(PIN_LED_EYES, OUTPUT);
   digitalWrite(PIN_LED_EYES, HIGH);
+
+    // Setup Motion Sensor
+  pinMode(PIN_MOTION_SENSOR, INPUT);
   
   // Setup DFPlayer-Mini
-  Serial1.setTX(PIN_DFPLAYER_TX);
-  Serial1.setRX(PIN_DFPLAYER_RX);
-  Serial1.begin(9600);
+  Serial1.begin(9600, SERIAL_8N1, PIN_DFPLAYER_RX, PIN_DFPLAYER_TX);
   dfPlayer.begin(Serial1);
   delay(2000);
   dfPlayer.volume(15);
@@ -193,11 +198,7 @@ void loop() {
 
 void moveServo(unsigned long now) {
   if (currentPulse != targetPulse) {
-    if (now - lastPulseUpdate > 3) {
-      if (!beakServo.attached()) {
-        beakServo.writeMicroseconds(currentPulse);
-        beakServo.attach(PIN_SERVO);
-      }
+    if (now - lastPulseUpdate > 5) {
       int diff = targetPulse - currentPulse;
       if (abs(diff) <= 10) currentPulse = targetPulse;
       else currentPulse += (diff > 0) ? 20 : -20;
