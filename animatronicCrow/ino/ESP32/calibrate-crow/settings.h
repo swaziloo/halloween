@@ -22,6 +22,8 @@
 #define SERVO_PWM_OPEN                1100 // default fully open PWM
 #define SERVO_PWM_CLOSED              1250 // default fully closed PWM
 #define SERVO_EASING_FACTOR           3.00 // determines animation smooting (smaller is smoother)
+#define SERVO_PWM_MIN                 1000 // safer min for calibration
+#define SERVO_PWM_MAX                 1500 // safer max for calibration
 
 // Audio Settings
 #define DFPLAYER_VOLUME               22  	// default Volume 0-30

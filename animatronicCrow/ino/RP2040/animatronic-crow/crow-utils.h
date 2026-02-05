@@ -23,7 +23,7 @@ bool updateBeak() {
   if (targetPWM != -1) {
     if (targetPWM != lastSentPWM) {
       beakServo.writeMicroseconds(targetPWM);
-      if (!beakServo.attached()) beakServo.attach(PIN_SERVO);
+      if (!beakServo.attached()) beakServo.attach(PIN_SERVO, SERVO_PWM_OPEN, SERVO_PWM_CLOSED);
       lastSentPWM = targetPWM;
       return true;
     }

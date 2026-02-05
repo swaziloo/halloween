@@ -54,7 +54,7 @@ void setup() {
   printInstructions();
 
   // configure servo
-  beakServo.attach(PIN_SERVO); 
+  beakServo.attach(PIN_SERVO, SERVO_PWM_MIN, SERVO_PWM_MAX); 
   beakServo.setTimerWidth(16);
 
   // Turn on Eye LEDs
