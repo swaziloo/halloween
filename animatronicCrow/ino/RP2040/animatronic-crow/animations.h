@@ -1,5 +1,5 @@
 // ============================================================================
-// ANIMATION DEFINITIONS
+// ANIMATION DEFINITIONS v2.1
 // ============================================================================
 #ifndef ANIMATIONS_H
 #define ANIMATIONS_H
@@ -51,11 +51,14 @@ const SoundAnimation soundAnimations[] PROGMEM = {
 const uint8_t NUM_ANIMATIONS = sizeof(soundAnimations) / sizeof(SoundAnimation);
 
 // Animation State
+static unsigned long animationStartTime = 0;
+static unsigned long animationEndTime = 0;
+static volatile bool animating = false;
 static const AnimKeyFrame* currentAnimation = nullptr;
 static uint8_t totalKeyframes = 0;
 static uint8_t currentKeyframe = 0;
-static unsigned long animationStartTime = 0;
-static volatile bool animating = false;
+static uint16_t cached_t0, cached_t1;
+static uint8_t  cached_p0, cached_p1;
 
 // Pending State (for the Audio Sync delay)
 static const AnimKeyFrame* pendingAnimation = nullptr;
@@ -81,8 +84,15 @@ inline void queuePendingAnimation(int idx, unsigned long startTime) {
     pendingAnimationStartTime = startTime;
 }
 
+inline void updateKeyframeCache() {
+  cached_t0 = pgm_read_word(&(currentAnimation[currentKeyframe].timeMs));
+  cached_p0 = pgm_read_byte(&(currentAnimation[currentKeyframe].position));
+  cached_t1 = pgm_read_word(&(currentAnimation[currentKeyframe + 1].timeMs));
+  cached_p1 = pgm_read_byte(&(currentAnimation[currentKeyframe + 1].position));
+}
+
 // provides the current 0-100% closed-open position for the animation
-// or -1 if the animation is not active 
+// or -1 if the animation is not active
 inline int getAnimPos() {
   if (easingLUT[100] == 0) hydrateEasingLUT(SERVO_PWM_OPEN, SERVO_PWM_CLOSED, SERVO_EASING_FACTOR);
 
@@ -93,8 +103,11 @@ inline int getAnimPos() {
       currentAnimation = pendingAnimation;
       totalKeyframes = pendingTotalFrames;
       currentKeyframe = 0;
+      updateKeyframeCache();
       animationStartTime = now;
-      animating = true;      // Now the flag is set!
+      uint16_t duration = pgm_read_word(&(currentAnimation[totalKeyframes - 1].timeMs));
+      animationEndTime = animationStartTime + duration;
+      animating = true;
       pendingAnimation = nullptr;
     }  else return -1; // still waiting for sync
   }
@@ -102,27 +115,27 @@ inline int getAnimPos() {
   if (!animating) return -1;
 
   // animate
-  unsigned long elapsed = now - animationStartTime;
 
-  while (currentKeyframe < totalKeyframes - 1) {
-    uint16_t nextTime = pgm_read_word(&(currentAnimation[currentKeyframe + 1].timeMs));
-    if (elapsed >= nextTime) currentKeyframe++;
-    else break;
-  }
-
-  if (currentKeyframe >= totalKeyframes - 1) {
+  if (now >= animationEndTime) {
     animating = false;
     return pgm_read_byte(&(currentAnimation[totalKeyframes - 1].position));
   }
 
-  uint16_t t0 = pgm_read_word(&(currentAnimation[currentKeyframe].timeMs));
-  uint16_t t1 = pgm_read_word(&(currentAnimation[currentKeyframe + 1].timeMs));
-  uint8_t p0 = pgm_read_byte(&(currentAnimation[currentKeyframe].position));
-  uint8_t p1 = pgm_read_byte(&(currentAnimation[currentKeyframe + 1].position));
-  
-  unsigned long sd = t1 - t0;
-  float t = (sd > 0) ? (float)(elapsed - t0) / (float)sd: 1.0f;
-  return p0 + t * (p1 - p0);
+  unsigned long elapsed = now - animationStartTime;
+
+  while (currentKeyframe < totalKeyframes - 2) {
+    uint16_t nextTime = pgm_read_word(&(currentAnimation[currentKeyframe + 1].timeMs));
+    if (elapsed >= nextTime) {
+      currentKeyframe++;
+      updateKeyframeCache();
+    }
+    else break;
+  }
+
+  unsigned long segmentDuration = cached_t1 - cached_t0;
+  unsigned long elapsedInSegment = elapsed - cached_t0;
+  if (elapsedInSegment >= segmentDuration || segmentDuration == 0) return cached_p1;
+  return cached_p0 + (int)((cached_p1 - cached_p0) * (float)elapsedInSegment / segmentDuration);
 }
 
 // provides the current, eased PWM position-in-range for the animation
