@@ -301,7 +301,7 @@ void initializeBeak() {
   showPixel(25, 25, 25); // NeoPixel: white
   int mid = (SERVO_PWM_OPEN + SERVO_PWM_CLOSED) / 2;
   beakServo.writeMicroseconds(mid);  // start center
-  beakServo.attach(PIN_SERVO);
+  beakServo.attach(PIN_SERVO, SERVO_PWM_OPEN, SERVO_PWM_CLOSED);
   delay(200);
   for (int p = mid; p > SERVO_PWM_OPEN; p--) {  // move open
     beakServo.writeMicroseconds(p);

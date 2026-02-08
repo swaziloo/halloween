@@ -199,7 +199,7 @@ void moveServo(unsigned long now) {
     if (now - lastPulseUpdate > 3) {
       if (!beakServo.attached()) {
         beakServo.writeMicroseconds(currentPulse);
-        beakServo.attach(PIN_SERVO);
+        beakServo.attach(PIN_SERVO, SERVO_PWM_MIN, SERVO_PWM_MAX);
       }
       int diff = targetPulse - currentPulse;
       if (abs(diff) <= 10) currentPulse = targetPulse;
@@ -268,7 +268,7 @@ void updateNeck() {
 void printInstructions() {
   Serial.println(F("--- Crow Diagnostic & Calibration Utility ------------------------------------"));
   Serial.println(F("Commands:"));
-  Serial.println(F("  b <val>           : Move Beak Servo to PWM (e.g. 'm 1000')"));
+  Serial.println(F("  b <val>           : Move Beak Servo to PWM (e.g. 'b 1000')"));
   Serial.println(F("  s <open> <closed> : Set Beak Servo limits open closed (e.g. 's 1100 1400') "));
   Serial.println(F("  a <num> <delay>   : Play Animation/Track # (1-14) (+optional audio delay ms)"));
   Serial.println(F("  v <0-30>          : Set DFPlayer Volume"));
@@ -277,5 +277,6 @@ void printInstructions() {
   Serial.println(F("  n <accel> <max>   : Neck Stepper: Test accel (+optional max speed) sweep"));
   Serial.println(F("  f <float>         : Animation smoothing factor (1.0: smoother 4.0: snappier)"));
   Serial.println(F("  e <0-1>           : Eyes mirror button/sensor: 0 for NO, 1 for YES"));
+  Serial.println(F("  p                 : Print modified PWM, Vol, Delay, and Factor to monitor"));
   Serial.println(F("------------------------------------------------------------------------------"));
 }

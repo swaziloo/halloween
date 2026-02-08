@@ -10,6 +10,8 @@
 // External objects defined in the main .ino
 extern Servo beakServo;
 extern DFRobotDFPlayerMini dfPlayer;
+extern unsigned int beakOpen;
+extern unsigned int beakClosed;
 
 static uint8_t lastSentPWM = -1;
 
@@ -23,7 +25,7 @@ bool updateBeak() {
   if (targetPWM != -1) {
     if (targetPWM != lastSentPWM) {
       beakServo.writeMicroseconds(targetPWM);
-      if (!beakServo.attached()) beakServo.attach(PIN_SERVO);
+      if (!beakServo.attached()) beakServo.attach(PIN_SERVO, beakOpen, beakClosed);
       lastSentPWM = targetPWM;
       return true;
     }
