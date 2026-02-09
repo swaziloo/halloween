@@ -356,6 +356,7 @@ void initializeDFPlayer() {
     Serial.println(F("[Init]   DFPlayer Mini online"));
     showPixel(50, 0, 50); // NeoPixel: purple
     
+    delay(2000);
     dfPlayer.volume(DFPLAYER_VOLUME);
     delay(200);
     dfPlayer.play(11);
